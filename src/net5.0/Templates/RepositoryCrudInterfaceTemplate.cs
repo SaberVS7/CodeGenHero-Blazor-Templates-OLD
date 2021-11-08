@@ -42,9 +42,10 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
                 var usings = new List<NamespaceItem>
                 {
-                    new NamespaceItem("CodeGenHero.Repository"),
                     new NamespaceItem(EntitiesNamespace),
-                    new NamespaceItem("System.Linq")
+                    new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums"),
+                    new NamespaceItem("System.Linq"),
+                    new NamespaceItem($"{BaseNamespace}.Repository.Infrastructure")
                 };
 
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);

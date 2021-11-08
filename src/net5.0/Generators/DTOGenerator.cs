@@ -29,6 +29,8 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             StringBuilder sb = new StringBuilder();
             sb.Append(GenerateHeader(usings, classNamespace));
+            sb.AppendLine($"\tpublic partial class {className}");
+            sb.AppendLine("{");
             sb.Append(GenerateConstructor(className));
 
             foreach(var property in entityProperties)
