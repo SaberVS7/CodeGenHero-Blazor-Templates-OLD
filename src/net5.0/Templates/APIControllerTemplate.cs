@@ -62,35 +62,35 @@ namespace CodeGenHero.Template.Blazor5.Templates
             {
                 var filteredEntityTypes = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
 
+                var usings = new List<NamespaceItem>
+                {
+                    new NamespaceItem("CodeGenHero.Repository"),
+                    new NamespaceItem("Marvin.JsonPatch"),
+                    new NamespaceItem("Microsoft.AspNetCore.Http"),
+                    new NamespaceItem("Microsoft.AspNetCore.Mvc"),
+                    new NamespaceItem("Microsoft.AspNetCore.Routing"),
+                    new NamespaceItem("Microsoft.EntityFrameworkCore"),
+                    new NamespaceItem("Microsoft.Extensions.Logging"),
+                    new NamespaceItem($"{BaseNamespace}.Api.Infrastructure"),
+                    new NamespaceItem($"{BaseNamespace}.Repository.Mappers"),
+                    new NamespaceItem($"{BaseNamespace}.Repository.Repositories"),
+                    new NamespaceItem($"{BaseNamespace}.Shared.DTO"),
+                    new NamespaceItem("System"),
+                    new NamespaceItem("System.Collections.Generic"),
+                    new NamespaceItem("System.Linq"),
+                    new NamespaceItem("System.Threading.Tasks"),
+                    new NamespaceItem("cghrEnums = CodeGenHero.Repository.Enums"),
+                    new NamespaceItem($"dto{NamespacePostfix} = {DtoNamespace}"),
+                    new NamespaceItem($"ent{NamespacePostfix} = {EntitiesNamespace}"),
+                    new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums")
+                };
+
                 foreach (var entity in filteredEntityTypes)
                 {
                     string outputfile = TemplateVariablesManager.GetOutputFile(templateIdentity: ProcessModel.TemplateIdentity,
                     fileName: Consts.OUT_APIControllerFilePath_DEFAULTVALUE);
                     outputfile = TokenReplacements(outputfile, entity);
                     string filepath = outputfile;
-
-                    var usings = new List<NamespaceItem>
-                    {
-                        new NamespaceItem("CodeGenHero.Repository"),
-                        new NamespaceItem("Marvin.JsonPatch"),
-                        new NamespaceItem("Microsoft.AspNetCore.Http"),
-                        new NamespaceItem("Microsoft.AspNetCore.Mvc"),
-                        new NamespaceItem("Microsoft.AspNetCore.Routing"),
-                        new NamespaceItem("Microsoft.EntityFrameworkCore"),
-                        new NamespaceItem("Microsoft.Extensions.Logging"),
-                        new NamespaceItem("MSC.WhittierArtists.Api.Infrastructure"),
-                        new NamespaceItem("MSC.WhittierArtists.Repository.Mappers"),
-                        new NamespaceItem("MSC.WhittierArtists.Repository.Repositories"),
-                        new NamespaceItem("MSC.WhittierArtists.Shared.DTO"),
-                        new NamespaceItem("System"),
-                        new NamespaceItem("System.Collections.Generic"),
-                        new NamespaceItem("System.Linq"),
-                        new NamespaceItem("System.Threading.Tasks"),
-                        new NamespaceItem("cghrEnums = CodeGenHero.Repository.Enums"),
-                        new NamespaceItem($"dto{NamespacePostfix} = {DtoNamespace}"),
-                        new NamespaceItem($"ent{NamespacePostfix} = {EntitiesNamespace}"),
-                        new NamespaceItem("waEnums = MSC.WhittierArtists.Shared.Constants.Enums")
-                    };
 
                     // Individualize the Class Name
                     string className = TokenReplacements(APIControllerClassName, entity);

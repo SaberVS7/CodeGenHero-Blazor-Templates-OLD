@@ -16,20 +16,20 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
         #region TemplateVariables
 
+        [TemplateVariable(defaultValue: Consts.PTG_BaseAPIControllerName_DEFAULT, description: Consts.PTG_BaseAPIControllerName_DESC)]
+        public string BaseAPIControllerClassName { get; set; }
+
+        [TemplateVariable(defaultValue: "false", description: "If true, will generate an Authorized version of the API Controller instead.")]
+        public bool AuthorizedController { get; set; }
+
         [TemplateVariable(defaultValue: Consts.PTG_APIControllerNamespace_DEFAULT, description: Consts.PTG_APIControllerNamespace_DESC)]
         public string APIControllerNamespace { get; set; }
 
         [TemplateVariable(defaultValue: "false", description: "If true, will include the flag [AutoInvalidateCacheOutput] in the generated code.")]
         public bool AutoInvalidateCacheOutput { get; set; }
 
-        [TemplateVariable(defaultValue: Consts.PTG_BaseAPIControllerName_DEFAULT, description: Consts.PTG_BaseAPIControllerName_DESC)]
-        public string BaseAPIControllerClassName { get; set; }
-
         [TemplateVariable(defaultValue: Consts.BaseAPIControllerOutputFilepath_DEFAULT, hiddenIndicator: true)]
         public string BaseAPIControllerOutputFilepath { get; set; }
-
-        [TemplateVariable(defaultValue: Consts.PTG_DtoNamespace_DEFAULT, description: Consts.PTG_DtoNamespace_DESC)]
-        public string DtoNamespace { get; set; }
 
         [TemplateVariable(defaultValue: Consts.PTG_RepositoryNamespace_DEFAULT, description: Consts.PTG_RepositoryNamespace_DESC)]
         public string RepositoryNamespace { get; set; }
@@ -53,22 +53,22 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     new NamespaceItem("System.Linq"),
                     new NamespaceItem("System.Net"),
                     new NamespaceItem("System.Runtime.CompilerServices"),
-                    new NamespaceItem("Microsoft.AspNetCore.Authorization"),
-                    new NamespaceItem("Microsoft.AspNetCore.Http"),
-                    new NamespaceItem("Microsoft.AspNetCore.Http.Extensions;"),
                     new NamespaceItem("Microsoft.AspNetCore.Mvc"),
-                    new NamespaceItem("Microsoft.AspNetCore.Routing"),
+                    new NamespaceItem("Microsoft.AspNetCore.Authorization"),
                     new NamespaceItem("Microsoft.Extensions.Logging"),
-                    new NamespaceItem("Microsoft.Extensions.Logging.Abstractions"),
                     new NamespaceItem(RepositoryNamespace),
-                    new NamespaceItem(DtoNamespace),
-                    new NamespaceItem("cghcEnums = CodeGenHero.Core.Enums")
+                    new NamespaceItem("Microsoft.AspNetCore.Http"),
+                    new NamespaceItem("Microsoft.AspNetCore.Routing"),
+                    new NamespaceItem("Microsoft.Extensions.Logging.Abstractions"),
+                    new NamespaceItem("Microsoft.AspNetCore.Http.Extensions;"),
+                    new NamespaceItem("{BaseNamespace}.Shared.DataService;"),
+                    new NamespaceItem("Enums = {BaseNamespace}.Shared.Constants.Enums")
                 };
 
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
 
                 var generator = new BaseAPIControllerGenerator(inflector: Inflector);
-                var generatedCode = generator.Generate(usings, APIControllerNamespace, NamespacePostfix, AutoInvalidateCacheOutput, BaseAPIControllerClassName);
+                var generatedCode = generator.Generate(usings, APIControllerNamespace, NamespacePostfix, AuthorizedController, AutoInvalidateCacheOutput, BaseAPIControllerClassName);
 
                 retVal.Files.Add(new OutputFile()
                 {

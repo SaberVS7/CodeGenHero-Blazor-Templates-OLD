@@ -91,21 +91,26 @@
 
         #endregion Class Names
 
-        // API Controller
+        /// Output Filepath Defaults
         public const string APIControllerFilePath_DEFAULTVALUE = "Blazor\\Controllers\\[tablename]Controller.cs";
 
-        // AutoMapper
         public const string AutoMapperProfileOutputFilepath_DEFAULT = "Blazor\\Repository\\{NamespacePostfix}AutoMapperProfile.cs";
 
-        // Base API Controller
         public const string BaseAPIControllerOutputFilepath_DEFAULT = "Blazor\\API\\{NamespacePostfix}BaseApiController.cs";
 
-        // Generic Factory Interface
         public const string GenericFactoryInterfaceOutputFilepath_DEFAULT = "Blazor\\Repository\\I{NamespacePostfix}GenericFactory.cs";
 
-        // Generic Factory
         public const string GenericFactoryOutputFilepath_DEFAULT = "Blazor\\Repository\\{NamespacePostfix}GenericFactory.cs";
 
+        public const string RepositoryCrudInterfaceOutputFilepath_DEFAULT = "Blazor\\Repository\\I{NamespacePostfix}RepositoryCrud.cs";
+
+        public const string RepositoryInterfaceOutputFilepath_DEFAULT = "Blazor\\Repository\\I{NamespacePostfix}Repository.cs";
+
+        public const string RepositoryOutputFilepath_DEFAULT = "Blazor\\Repository\\{NamespacePostfix}Repository.cs";
+
+        public const string DTOFilePath_DEFAULTVALUE = "Blazor\\DTO\\{NamespacePostfix}\\[tablename].cs";
+
+        /// Output Filepath Variable Names
         public const string OUT_APIControllerFilePath_DEFAULTVALUE = "APIControllerOutputFilepath";
 
         public const string OUT_AutoMapperProfileOutputFilepath_DEFAULT = "AutoMapperProfileOutputFilepath";
@@ -122,13 +127,6 @@
 
         public const string OUT_RepositoryOutputFilepath_DEFAULT = "RepositoryOutputFilepath";
 
-        // CRUD Interface
-        public const string RepositoryCrudInterfaceOutputFilepath_DEFAULT = "Blazor\\Repository\\I{NamespacePostfix}RepositoryCrud.cs";
-
-        // Repository Interface
-        public const string RepositoryInterfaceOutputFilepath_DEFAULT = "Blazor\\Repository\\I{NamespacePostfix}Repository.cs";
-
-        // Repository
-        public const string RepositoryOutputFilepath_DEFAULT = "Blazor\\Repository\\{NamespacePostfix}Repository.cs";
+        public const string OUT_DTOFilePath_DEFAULTVALUE = "DTOOutputFilepath";
     }
 }
