@@ -6,7 +6,7 @@ using CodeGenHero.Core;
 
 namespace CodeGenHero.Template.Blazor5.Templates
 {
-    class DTOTemplate : BaseBlazorTemplate
+    internal class DTOTemplate : BaseBlazorTemplate
     {
         public DTOTemplate()
         {

@@ -63,6 +63,9 @@
         public const string PTG_RepositoryNamespace_DEFAULT = "{BaseNamespace}.Repository.Repositories.{NamespacePostFix}";
         public const string PTG_RepositoryNamespace_DESC = "The namespace of the Repository classes this template will use. Should be promoted to Global.";
 
+        public const string PTG_WebApiDataServiceNamespace_DEFAULT = "{BaseNamespace}.App.Services";
+        public const string PTG_WebApiDataServiceNamespace_DESC = "The namespace of the Web API Data Service classes this template will use. Should be promoted to Global.";
+
         #endregion Namespaces
 
         #region Class Names
@@ -89,6 +92,9 @@
         public const string PTG_RepositoryName_DEFAULT = "{namespacePostfix}Repository";
         public const string PTG_RepositoryName_DESC = "The name of the Repository class. Should be promoted to Global.";
 
+        public const string PTG_WebApiDataServiceInterfaceName_DEFAULT = "IWebApiDataService{namespacePostfix}";
+        public const string PTG_WebApiDataServiceInterfaceName_DESC = "The name of the Web API Data Service class. Should be promoted to Global.";
+
         #endregion Class Names
 
         /// Output Filepath Defaults
@@ -110,6 +116,8 @@
 
         public const string DTOFilePath_DEFAULTVALUE = "Blazor\\DTO\\{NamespacePostfix}\\[tablename].cs";
 
+        public const string WebApiDataServiceInterfaceOuputFilepath_DEFAULT = "Blazor\\Services\\IWebApiDataService{NamespacePostfix}.cs";
+
         /// Output Filepath Variable Names
         public const string OUT_APIControllerFilePath_DEFAULTVALUE = "APIControllerOutputFilepath";
 
@@ -128,5 +136,7 @@
         public const string OUT_RepositoryOutputFilepath_DEFAULT = "RepositoryOutputFilepath";
 
         public const string OUT_DTOFilePath_DEFAULTVALUE = "DTOOutputFilepath";
+
+        public const string OUT_WebApiDataServiceInterfaceOuputFilepath_DEFAULT = "WebApiDataServiceInterfaceOuputFilepath";
     }
 }
