@@ -48,6 +48,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
                 sb.Append(GenerateInsertOperation(entityName));
                 sb.Append(GenerateGetQueryable(entityName));
+                sb.Append(GenerateGetPageData(entityName));
                 sb.Append(GenerateGetFirstOrDefault(entityName, tableNamePlural, methodParameterSignature, methodParameterSignatureWithoutFieldTypes, whereClause, whereClauseWithObjectInstancePrefix));
                 sb.Append(GenerateUpdateOperation(entityName, tableNamePlural, whereClauseWithObjectInstancePrefix));
                 sb.Append(GenerateDeleteOperations(entityName, tableNamePlural, whereClause, whereClauseWithObjectInstancePrefix, methodParameterSignature));
@@ -274,13 +275,47 @@ namespace CodeGenHero.Template.Blazor5.Generators
             return sb.ToString();
         }
 
+        private string GenerateGetPageData(string entityName)
+        {
+            IndentingStringBuilder sb = new IndentingStringBuilder(2);
+
+            sb.AppendLine($"public async Task<RepositoryPageDataResponse<IList<{entityName}>>> GetPageData_{entityName}Async(RepositoryPageDataRequest request)");
+            sb.AppendLine("{");
+
+            sb.AppendLine($"\tvar qry = GetQueryable_{entityName}(request.RelatedEntitiesType).AsNoTracking();");
+            sb.AppendLine($"\tvar retVal = new RepositoryPageDataResponse<IList<{entityName}>>(request);");
+            sb.AppendLine(string.Empty);
+
+            sb.AppendLine("\tIList<string> filterList = new List<string>(request.FilterList);");
+            sb.AppendLine($"\tRunCustomLogicAfterGetQueryableList_{entityName}(ref qry, ref filterList);");
+            sb.AppendLine("\tqry = qry.ApplyFilter(filterList);");
+            sb.AppendLine($"\tqry.ApplySort(request.Sort ?? (typeof(Artist).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))");
+            sb.AppendLine("\t\t.Take(request.PageSize).ToListAsync();");
+            sb.AppendLine(string.Empty);
+
+            sb.AppendLine("\tretVal.TotalCount = qry.Count();");
+            sb.AppendLine("\tretVal.Data = await qry.Skip(request.PageSize * (request.Page - 1))");
+            sb.AppendLine("\t\t.Take(request.PageSize).ToListAsync();");
+            sb.AppendLine(string.Empty);
+
+            sb.AppendLine("\treturn retVal;");
+
+            sb.AppendLine("}");
+            sb.AppendLine(string.Empty);
+
+            return sb.ToString();
+        }
+
         private string GenerateGetQueryable(string entityName)
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine($"public IQueryable<{entityName}> GetQueryable_{entityName}()");
+            sb.AppendLine($"public IQueryable<{entityName}> GetQueryable_{entityName}(Enums.RelatedEntitiesType relatedEntitiesType)");
             sb.AppendLine("{");
-            sb.AppendLine($"\treturn _ctx.Set<{entityName}>();");
+            sb.AppendLine($"\tvar retVal = GetQueryable<{entityName}>();");
+            sb.AppendLine($"ApplyRelatedEntitiesType(ref retVal, relatedEntitiesType);");
+            sb.AppendLine(string.Empty);
+            sb.AppendLine("return retVal");
             sb.AppendLine("}");
 
             sb.AppendLine(string.Empty);
@@ -309,10 +344,17 @@ namespace CodeGenHero.Template.Blazor5.Generators
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine($"public async Task<{tableName}> GetFirstOrDefaultAsync({tableName} item)");
+            sb.AppendLine($"public async Task<{tableName}> GetFirstOrDefaultAsync({tableName} item, Enums.RelatedEntitiesType relatedEntitiesType)");
             sb.AppendLine("{");
 
-            sb.AppendLine($"return await _ctx.{tableNamePlural}.Where({whereClauseWithObjectInstancePrefix}).FirstOrDefaultAsync();");
+            sb.AppendLine($"\tvar qry = GetQueryable_{tableName}(relatedEntitiesType)");
+            sb.AppendLine($"\t\t.Where({whereClauseWithObjectInstancePrefix});");
+            sb.AppendLine("\tvar retVal = await qry.FirstOrDefaultAsync();");
+            sb.AppendLine(string.Empty);
+
+            sb.AppendLine("return retVal;");
+
+            //sb.AppendLine($"return await _ctx.{tableNamePlural}.Where({whereClauseWithObjectInstancePrefix}).FirstOrDefaultAsync();");
 
             sb.AppendLine("}");
             sb.AppendLine(string.Empty);
@@ -323,15 +365,15 @@ namespace CodeGenHero.Template.Blazor5.Generators
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine($"public async Task<{tableName}> Get_{tableName}Async({methodParameterSignature}, waEnums.RelatedEntitiesType relatedEntitiesType)");
+            sb.AppendLine($"public async Task<{tableName}> Get_{tableName}Async({methodParameterSignature}, Enums.RelatedEntitiesType relatedEntitiesType)");
             sb.AppendLine("{");
 
-            sb.AppendLine($"\tvar qryItem = GetQueryable_{tableName}();");
-            sb.AppendLine($"\tRunCustomLogicOnGetQueryableByPK_{tableName}(ref qryItem, {methodParameterSignatureWithoutFieldTypes}, relatedEntitiesType);");
-            sb.AppendLine("\tqryItem = qryItem.AsNoTracking();");
+            sb.AppendLine($"\tvar qry = GetQueryable_{tableName}(relatedEntitiesType);");
+            sb.AppendLine($"\tRunCustomLogicOnGetQueryableByPK_{tableName}(ref qry, {methodParameterSignatureWithoutFieldTypes}, relatedEntitiesType);");
+            sb.AppendLine("\tqry = qry.AsNoTracking();");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine($"\tvar dbItem = await qryItem.Where({whereClause}).FirstOrDefaultAsync();");
+            sb.AppendLine($"\tvar dbItem = await qry.Where({whereClause}).FirstOrDefaultAsync();");
             sb.AppendLine("\tif (!(dbItem is null))");
             sb.AppendLine("\t{");
             sb.AppendLine($"\t\tRunCustomLogicOnGetEntityByPK_{tableName}(ref dbItem, {methodParameterSignatureWithoutFieldTypes}, relatedEntitiesType);");
@@ -351,6 +393,11 @@ namespace CodeGenHero.Template.Blazor5.Generators
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
+            sb.AppendLine($"partial void RunCustomLogicAfterGetQueryableList_{tableName}(");
+            sb.AppendLine($"\tref IQueryable<{tableName}> dbItems,");
+            sb.AppendLine("\tref IList<string> filterList");
+            sb.AppendLine(string.Empty);
+
             sb.AppendLine($"partial void RunCustomLogicAfterInsert_{tableName}({tableName} item, IRepositoryActionResult<{tableName}> result);");
             sb.AppendLine(string.Empty);
 
@@ -362,6 +409,9 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             sb.AppendLine($"partial void RunCustomLogicOnGetEntityByPK_{tableName}(ref {tableName} dbItem, {methodParameterSignature}, waEnums.RelatedEntitiesType relatedEntitiesType);");
             sb.AppendLine(string.Empty);
+
+            sb.AppendLine("partial void ApplyRelatedEntitiesType(");
+            sb.AppendLine($"\tref IQueryable<{tableName}> qry, Enums.RelatedEntitiesType relatedEntitiesType);");
 
             return sb.ToString();
         }
