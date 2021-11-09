@@ -48,12 +48,13 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
                 var usings = new List<NamespaceItem>
                 {
-                    new NamespaceItem("CodeGenHero.Repository"),
                     new NamespaceItem(EntitiesNamespace),
+                    new NamespaceItem($"{BaseNamespace}.Repository.Infrastructure"),
                     new NamespaceItem("System"),
+                    new NamespaceItem("System.Collections.Generic"),
                     new NamespaceItem("System.Threading.Tasks"),
                     new NamespaceItem($"ent{NamespacePostfix} = {EntitiesNamespace}"),
-                    new NamespaceItem("waEnums = MSC.WhittierArtists.Shared.Constants.Enums")
+                    new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums")
                 };
 
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
