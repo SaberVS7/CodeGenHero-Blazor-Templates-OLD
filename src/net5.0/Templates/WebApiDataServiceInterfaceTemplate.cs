@@ -16,6 +16,9 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
         #region TemplateVariables
 
+        [TemplateVariable(defaultValue: Consts.PTG_WebApiDataServiceNamespace_DEFAULT, description: Consts.PTG_WebApiDataServiceNamespace_DESC)]
+        public string WebApiDataServiceNamespace { get; set; }
+
         [TemplateVariable(defaultValue: Consts.PTG_DtoNamespace_DEFAULT, description: Consts.PTG_DtoNamespace_DESC)]
         public string DtoNamespace { get; set; }
 
@@ -49,7 +52,14 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
 
+                var generator = new WebApiDataServiceInterfaceGenerator(inflector: Inflector);
+                string generatedCode = generator.Generate(usings, WebApiDataServiceNamespace, NamespacePostfix, entities, WebApiDataServiceInterfaceClassName);
 
+                retVal.Files.Add(new OutputFile()
+                {
+                    Content = generatedCode,
+                    Name = filepath
+                });
             }
             catch (Exception ex)
             {
