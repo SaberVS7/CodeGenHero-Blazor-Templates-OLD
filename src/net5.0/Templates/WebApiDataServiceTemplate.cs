@@ -14,13 +14,58 @@ namespace CodeGenHero.Template.Blazor5.Templates
         {
         }
 
+        #region TemplateVariables
+
+        [TemplateVariable(defaultValue: Consts.PTG_WebApiDataServiceNamespace_DEFAULT, description: Consts.PTG_WebApiDataServiceNamespace_DESC)]
+        public string WebApiDataServiceNamespace { get; set; }
+
+        [TemplateVariable(defaultValue: Consts.PTG_DtoNamespace_DEFAULT, description: Consts.PTG_DtoNamespace_DESC)]
+        public string DtoNamespace { get; set; }
+
+        [TemplateVariable(defaultValue: Consts.PTG_WebApiDataServiceInterfaceName_DEFAULT, description: Consts.PTG_WebApiDataServiceInterfaceName_DESC)]
+        public string WebApiDataServiceInterfaceClassName { get; set; }
+
+        [TemplateVariable(defaultValue: Consts.PTG_WebApiDataServiceClassName_DEFAULT, description: Consts.PTG_WebApiDataServiceClassName_DESC)]
+        public string WebApiDataServiceClassName { get; set; }
+
+        [TemplateVariable(defaultValue: Consts.WebApiDataServiceOutputFilepath_DEFAULT, hiddenIndicator: true)]
+        public string WebApiDataServiceOuputFilepath { get; set; }
+
+        #endregion
+
         public override TemplateOutput Generate()
         {
             TemplateOutput retVal = new TemplateOutput();
 
             try
             {
+                string outputFile = TemplateVariablesManager.GetOutputFile(templateIdentity: ProcessModel.TemplateIdentity,
+                    fileName: Consts.OUT_WebApiDataServiceOuputFilepath_DEFAULT);
+                string filepath = outputFile;
 
+                var usings = new List<NamespaceItem>
+                {
+                    new NamespaceItem("System"),
+                    new NamespaceItem("System.Collections.Generic"),
+                    new NamespaceItem("System.Net.Http"),
+                    new NamespaceItem("System.Threading.Tasks"),
+                    //new NamespaceItem("System.Text.Json")
+                    new NamespaceItem("Microsoft.Extensions.Logging"),
+                    new NamespaceItem($"{BaseNamespace}.Shared.DataService"),
+                    new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums"),
+                    new NamespaceItem(DtoNamespace)
+                };
+
+                var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
+
+                //var generator = new WebApiDataServiceGenerator(inflector: Inflector);
+                //string generatedCode = generator.Generate();
+
+                //retVal.Files.Add(new OutputFile()
+                //{
+                //    Content = generatedCode,
+                //    Name = filepath
+                //});
             }
             catch (Exception ex)
             {

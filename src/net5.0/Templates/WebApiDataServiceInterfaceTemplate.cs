@@ -25,7 +25,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
         [TemplateVariable(defaultValue: Consts.PTG_WebApiDataServiceInterfaceName_DEFAULT, description: Consts.PTG_WebApiDataServiceInterfaceName_DESC)]
         public string WebApiDataServiceInterfaceClassName { get; set; }
 
-        [TemplateVariable(defaultValue: Consts.WebApiDataServiceInterfaceOuputFilepath_DEFAULT, hiddenIndicator: true)]
+        [TemplateVariable(defaultValue: Consts.WebApiDataServiceInterfaceOutputFilepath_DEFAULT, hiddenIndicator: true)]
         public string WebApiDataServiceInterfaceOuputFilepath { get; set; }
 
         #endregion

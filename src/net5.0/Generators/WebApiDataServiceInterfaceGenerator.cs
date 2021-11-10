@@ -35,6 +35,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.Append(GenerateUpdate(entities));
             sb.Append(GenerateDelete(entities));
 
+            sb.Append(GenerateFooter());
             return sb.ToString();
         }
 
