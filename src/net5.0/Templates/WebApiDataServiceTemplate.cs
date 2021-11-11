@@ -31,6 +31,9 @@ namespace CodeGenHero.Template.Blazor5.Templates
         [TemplateVariable(defaultValue: Consts.WebApiDataServiceOutputFilepath_DEFAULT, hiddenIndicator: true)]
         public string WebApiDataServiceOuputFilepath { get; set; }
 
+        [TemplateVariable(defaultValue: Consts.WebApiDataServiceApiRelativeURL_DEFAULT, description: Consts.WebApiDataServiceApiRelativeURL_DESC)]
+        public string ApiRelativeURL { get; set; }
+
         #endregion
 
         public override TemplateOutput Generate()
@@ -53,19 +56,19 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     new NamespaceItem("Microsoft.Extensions.Logging"),
                     new NamespaceItem($"{BaseNamespace}.Shared.DataService"),
                     new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums"),
-                    new NamespaceItem(DtoNamespace)
+                    new NamespaceItem("xDTO = {DtoNamespace}")
                 };
 
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
 
-                //var generator = new WebApiDataServiceGenerator(inflector: Inflector);
-                //string generatedCode = generator.Generate();
+                var generator = new WebApiDataServiceGenerator(inflector: Inflector);
+                string generatedCode = generator.Generate(usings, WebApiDataServiceNamespace, NamespacePostfix, entities, WebApiDataServiceClassName, WebApiDataServiceInterfaceClassName, ApiRelativeURL);
 
-                //retVal.Files.Add(new OutputFile()
-                //{
-                //    Content = generatedCode,
-                //    Name = filepath
-                //});
+                retVal.Files.Add(new OutputFile()
+                {
+                    Content = generatedCode,
+                    Name = filepath
+                });
             }
             catch (Exception ex)
             {

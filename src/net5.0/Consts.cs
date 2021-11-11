@@ -100,6 +100,7 @@
 
         #endregion Class Names
 
+        #region Output Filepaths
         /// Output Filepath Defaults
         public const string APIControllerFilePath_DEFAULTVALUE = "Blazor\\Controllers\\[tablename]Controller.cs";
 
@@ -122,7 +123,9 @@
         public const string WebApiDataServiceInterfaceOutputFilepath_DEFAULT = "Blazor\\Services\\IWebApiDataService{NamespacePostfix}.cs";
 
         public const string WebApiDataServiceOutputFilepath_DEFAULT = "Blazor\\Services\\WebApiDataService{NamespacePostfix}.cs";
+        #endregion
 
+        #region Output Variable Names
         /// Output Filepath Variable Names
         public const string OUT_APIControllerFilePath_DEFAULTVALUE = "APIControllerOutputFilepath";
 
@@ -145,5 +148,11 @@
         public const string OUT_WebApiDataServiceInterfaceOuputFilepath_DEFAULT = "WebApiDataServiceInterfaceOuputFilepath";
 
         public const string OUT_WebApiDataServiceOuputFilepath_DEFAULT = "WebApiDataServiceOutputFilepath";
+        #endregion
+
+        /// Class-specific variables
+        // Web API Data Service
+        public const string WebApiDataServiceApiRelativeURL_DEFAULT = "api/{namespacePostfix}";
+        public const string WebApiDataServiceApiRelativeURL_DESC = "Relative URL of the API's route";
     }
 }
