@@ -76,7 +76,7 @@
         public const string PTG_AutoMapperName_DESC = "The name of the AutoMapper Profile class. Should be promoted to Global.";
         public const string PTG_BaseAPIControllerName_DEFAULT = "{namespacePostfix}BaseApiController";
         public const string PTG_BaseAPIControllerName_DESC = "The name of the Base API Controller class. Should be promoted to Global.";
-        public const string PTG_DbContextName_DEFAULT = "{NamespacePostFix}DataContext";
+        public const string PTG_DbContextName_DEFAULT = "{namespacePostfix}DataContext";
         public const string PTG_DbContextName_DESC = "The name of the DbContext class this Repository is expected to access. Should be promoted to Global.";
 
         public const string PTG_GenericFactoryInterfaceName_DEFAULT = "I{namespacePostfix}GenericFactory";
@@ -97,6 +97,9 @@
 
         public const string PTG_WebApiDataServiceClassName_DEFAULT = "WebApiDataService{namespacePostfix}";
         public const string PTG_WebApiDataServiceClassName_DESC = "The name of the Web API Data Service class. Should be promoted to Global.";
+
+        public const string PTG_ApiStatusControllerClassName_DEFAULT = "{namespacePostfix}ApiStatusController";
+        public const string PTG_ApiStatusControllerClassName_DESC = "The name of the API Status Controller class. Should be promoted to Global.";
 
         #endregion Class Names
 
@@ -123,6 +126,9 @@
         public const string WebApiDataServiceInterfaceOutputFilepath_DEFAULT = "Blazor\\Services\\IWebApiDataService{NamespacePostfix}.cs";
 
         public const string WebApiDataServiceOutputFilepath_DEFAULT = "Blazor\\Services\\WebApiDataService{NamespacePostfix}.cs";
+
+        public const string ApiStatusControllerOutputFilepath_DEFAULT = "Blazor\\API\\{NamespacePostfix}ApiStatusController.cs";
+
         #endregion
 
         #region Output Variable Names
@@ -148,6 +154,9 @@
         public const string OUT_WebApiDataServiceInterfaceOuputFilepath_DEFAULT = "WebApiDataServiceInterfaceOuputFilepath";
 
         public const string OUT_WebApiDataServiceOuputFilepath_DEFAULT = "WebApiDataServiceOutputFilepath";
+
+        public const string OUT_ApiStatusControllerOutputFilepath_DEFAULT = "ApiStatusControllerOutputFilepath";
+
         #endregion
 
         /// Class-specific variables
