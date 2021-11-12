@@ -22,6 +22,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             List<NameValue> maxRequestPerPageOverrides,
             string className,
             string baseAPIControllerClassName,
+            string repositoryInterfaceClassName,
             string genericFactoryInterfaceClassName)
         {
             var entityName = $"{entity.ClrType.Name}";
@@ -39,12 +40,11 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\t{");
 
             sb.AppendLine($"\t\tprivate const string GET_LIST_ROUTE_NAME = \"{humanizedEntityName}{namespacePostfix}List\";");
-            sb.AppendLine($"\t\tprivate const int maxPageSize = {maxPageSize};");
-            sb.AppendLine(string.Empty);
             sb.AppendLine($"\t\tprivate {genericFactoryInterfaceClassName}<ent{namespacePostfix}.{humanizedEntityName}, dto{namespacePostfix}.{humanizedEntityName}> _factory;");
+            sb.AppendLine($"\t\tprivate int maxPageSize = {maxPageSize};");
             sb.AppendLine(string.Empty);
 
-            sb.Append(GenerateConstructor(className, namespacePostfix, entityName, genericFactoryInterfaceClassName));
+            sb.Append(GenerateConstructor(className, namespacePostfix, entityName, repositoryInterfaceClassName, genericFactoryInterfaceClassName));
 
             sb.Append(GenerateDelete(entity));
             sb.Append(GenerateGet(entity, namespacePostfix, entityName));
@@ -59,7 +59,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             return sb.ToString();
         }
 
-        private string GenerateConstructor(string className, string namespacePostfix, string entityName, string genericFactoryInterfaceClassName)
+        private string GenerateConstructor(string className, string namespacePostfix, string entityName, string repositoryInterfaceClassName, string genericFactoryInterfaceClassName)
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
@@ -67,7 +67,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\tIServiceProvider serviceProvider,");
             sb.AppendLine("\tIHttpContextAccessor httpContextAccessor,");
             sb.AppendLine("\tLinkGenerator linkGenerator,");
-            sb.AppendLine($"\tI{namespacePostfix}Repository repository,");
+            sb.AppendLine($"\t{repositoryInterfaceClassName} repository,");
             sb.AppendLine($"\t{genericFactoryInterfaceClassName}<ent{namespacePostfix}.{entityName}, dto{namespacePostfix}.{entityName}> factory)");
             sb.AppendLine($"\t: base(logger, serviceProvider, httpContextAccessor, linkGenerator, repository)");
             sb.AppendLine("{");
@@ -142,7 +142,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine($"[HttpGet(template: \"{{{methodSignature}}}/{{relatedEntitiesType:relatedEntitiesType=None}}\")]");
+            sb.AppendLine($"[HttpGet(template: \"ById/{{{methodSignature}}}/{{relatedEntitiesType:relatedEntitiesType=None}}\")]");
             sb.AppendLine("[VersionedActionConstraint(allowedVersion: 1, order: 100)]");
             sb.AppendLine($"public async Task<IActionResult> Get({methodSignatureWithType}, waEnums.RelatedEntitiesType relatedEntitiesType)");
             sb.AppendLine("{");
@@ -177,10 +177,11 @@ namespace CodeGenHero.Template.Blazor5.Generators
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine("[HttpGet(Name = GET_LIST_ROUTE_NAME)]");
+            sb.AppendLine("[HttpGet(\"{relatedEntitiesType:relatedEntitiesType=None}\", Name = GET_LIST_ROUTE_NAME)]");
             sb.AppendLine("[VersionedActionConstraint(allowedVersion: 1, order: 100)]");
-            sb.AppendLine("public async Task<IActionResult> Get(string sort = null,");
-            sb.AppendLine("\tstring fields = null, string filter = null, int page = 1, int pageSize = maxPageSize)");
+            sb.AppendLine("public async Task<IActionResult> Get(Enums.RelatedEntitiesType relatedEntitiesType,");
+            sb.AppendLine("\tstring sort = null, string fields = null, string filter = null,");
+            sb.AppendLine("\tint page = 1, int pageSize = maxPageSize)");
             sb.AppendLine("{");
 
             sb.AppendLine("\ttry");
@@ -191,14 +192,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine(string.Empty);
 
             sb.AppendLine("\t\tvar fieldList = GetListByDelimiter(fields);");
-            sb.AppendLine("\t\tbool childrenRequested = fields == null ? false : fields.Contains('.');");
-            sb.AppendLine(string.Empty);
-
             sb.AppendLine("\t\tvar filterList = GetListByDelimiter(filter);");
-            sb.AppendLine($"\t\tvar dbItems = Repo.GetQueryable_{entityName}().AsNoTracking();");
-            sb.AppendLine($"\t\tRunCustomLogicAfterGetQueryableList(ref dbItems, ref filterList);");
-            sb.AppendLine("\t\tdbItems = dbItems.ApplyFilter(filterList);");
-            sb.AppendLine($"\t\tdbItems = dbItems.ApplySort(sort ?? (typeof(ent{namespacePostfix}.{entityName}).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)).First().Name);");
             sb.AppendLine(string.Empty);
 
             sb.AppendLine("\t\tif (pageSize > maxPageSize)");
@@ -207,15 +201,21 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\t\t}");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine("\t\tPageData paginationHeader = BuildPaginationHeader(GET_LIST_ROUTE_NAME, page: page, totalCount: dbItems.Count(), pageSize: pageSize, sort: sort);");
-            sb.AppendLine("\t\tHttpContextAccessor.HttpContext.Response.Headers.Add(\"X-Pagination\", Newtonsoft.Json.JsonConvert.SerializeObject(paginationHeader));");
-            sb.AppendLine(string.Empty);
+            sb.AppendLine("\t\tvar request = new RepositoryPageDataRequest(fieldList: fieldList,");
+            sb.AppendLine("\t\t\tfilterList: filterList, page: page, pageSize: pageSize, sort: sort,");
+            sb.AppendLine("\t\t\trelatedEntitiesType: relatedEntitiesType);");
 
-            sb.AppendLine("\t\treturn Ok(dbItems");
-            sb.AppendLine("\t\t.Skip(pageSize * (page - 1))");
-            sb.AppendLine("\t\t.Take(pageSize)");
-            sb.AppendLine("\t\t.ToList()");
-            sb.AppendLine("\t\t.Select(x => _factory.CreateDataShapedObject(x, fieldList, childrenRequested)));");
+            sb.AppendLine($"\t\tRepositoryPageDataResponse<IList<ent{namespacePostfix}.{entityName}>> response =");
+            sb.AppendLine($"\t\t\tawait Repo.GetPageData_{entityName}Async(request);");
+
+            sb.AppendLine("\t\tPageData paginationHeader = BuildPaginationHeader(nameof(Get), page: page,");
+            sb.AppendLine("\t\t\ttotalCount: response.TotalCount, pageSize: response.PageSize, sort: response.Sort);");
+
+            sb.AppendLine("\t\tHttpContextAccessor.HttpContext.Response.Headers.Add(\"Access-Control-Expose-Headers\", \"X-Pagination\");");
+            sb.AppendLine("\t\tHttpContextAccessor.HttpContext.Response.Headers.Add(\"X-Pagination\", Newtonsoft.Json.JsonConvert.SerializeObject(paginationHeader));");
+
+            sb.AppendLine("\t\tvar retVal = response.Data.Select(x => _factory.CreateDataShapedObject(x, fieldList));");
+            sb.AppendLine("\t\treturn Ok(retVal);");
 
             sb.AppendLine("\t}");
             sb.AppendLine("\tcatch (Exception ex)");
@@ -233,9 +233,6 @@ namespace CodeGenHero.Template.Blazor5.Generators
         private string GeneratePartialMethodSignatures(string namespacePostfix, string entityName)
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
-
-            sb.AppendLine($"partial void RunCustomLogicAfterGetQueryableList(ref IQueryable<ent{namespacePostfix}.{entityName}> dbItems, ref List<string> filterList);");
-            sb.AppendLine(string.Empty);
 
             sb.AppendLine($"partial void RunCustomLogicAfterInsert(ref ent{namespacePostfix}.{entityName} newDBItem, ref IRepositoryActionResult<ent{namespacePostfix}.{entityName}> result);");
             sb.AppendLine(string.Empty);
@@ -347,7 +344,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\t\tvar result = await Repo.InsertAsync(newDBItem);");
             sb.AppendLine("\t\tRunCustomLogicAfterInsert(ref newDBItem, ref result);");
 
-            sb.AppendLine("\t\tif (result.Status == cghrEnums.RepositoryActionStatus.Created)");
+            sb.AppendLine("\t\tif (result.Status == RepositoryActionStatus.Created)");
             sb.AppendLine("\t\t{");
 
             sb.AppendLine("\t\t\tvar newDTOItem = _factory.Create(result.Entity); // Map created DB Entity to a DTO");

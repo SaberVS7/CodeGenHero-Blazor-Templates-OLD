@@ -38,8 +38,11 @@ namespace CodeGenHero.Template.Blazor5.Templates
         public string GenericFactoryInterfaceClassName { get; set; }
 
         [TemplateVariable(defaultValue: null,
-                                            description: "A list of MSC.CodeGenHero.DTO.NameValue items serialized as JSON that correspond to table names and integer values for the maximum number of rows to return for a single request for a page of data.")]
+            description: "A list of MSC.CodeGenHero.DTO.NameValue items serialized as JSON that correspond to table names and integer values for the maximum number of rows to return for a single request for a page of data.")]
         public string MaxRequestPerPageOverrideByTableName { get; set; }
+
+        [TemplateVariable(defaultValue: Consts.PTG_RepositoryInterfaceClassName_DEFAULT, description: Consts.PTG_RepositoryInterfaceClassName_DESC)]
+        public string RepositoryInterfaceClassName { get; set; }
 
         [TemplateVariable(defaultValue: Consts.PTG_RepositoryNamespace_DEFAULT, description: Consts.PTG_RepositoryNamespace_DESC)]
         public string RepositoryNamespace { get; set; }
@@ -64,22 +67,21 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
                 var usings = new List<NamespaceItem>
                 {
-                    new NamespaceItem("CodeGenHero.Repository"),
                     new NamespaceItem("Marvin.JsonPatch"),
                     new NamespaceItem("Microsoft.AspNetCore.Http"),
                     new NamespaceItem("Microsoft.AspNetCore.Mvc"),
                     new NamespaceItem("Microsoft.AspNetCore.Routing"),
-                    new NamespaceItem("Microsoft.EntityFrameworkCore"),
                     new NamespaceItem("Microsoft.Extensions.Logging"),
                     new NamespaceItem($"{BaseNamespace}.Api.Infrastructure"),
+                    new NamespaceItem($"{BaseNamespace}.Repository.Infrastructure"),
                     new NamespaceItem($"{BaseNamespace}.Repository.Mappers"),
                     new NamespaceItem($"{BaseNamespace}.Repository.Repositories"),
-                    new NamespaceItem($"{BaseNamespace}.Shared.DTO"),
+                    new NamespaceItem($"{BaseNamespace}.Shared.DataService"),
                     new NamespaceItem("System"),
                     new NamespaceItem("System.Collections.Generic"),
                     new NamespaceItem("System.Linq"),
                     new NamespaceItem("System.Threading.Tasks"),
-                    new NamespaceItem("cghrEnums = CodeGenHero.Repository.Enums"),
+                    new NamespaceItem($"static {BaseNamespace}.Repository.Infrastucture.Enums"),
                     new NamespaceItem($"dto{NamespacePostfix} = {DtoNamespace}"),
                     new NamespaceItem($"ent{NamespacePostfix} = {EntitiesNamespace}"),
                     new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums")
@@ -96,7 +98,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     string className = TokenReplacements(APIControllerClassName, entity);
 
                     var generator = new APIControllerGenerator(inflector: Inflector);
-                    string generatedCode = generator.Generate(usings, APIControllerNamespace, NamespacePostfix, entity, maxRequestPerPageOverrides, className, BaseAPIControllerClassName, GenericFactoryInterfaceClassName);
+                    string generatedCode = generator.Generate(usings, APIControllerNamespace, NamespacePostfix, entity, maxRequestPerPageOverrides, className, BaseAPIControllerClassName, RepositoryInterfaceClassName, GenericFactoryInterfaceClassName);
 
                     retVal.Files.Add(new OutputFile()
                     {
