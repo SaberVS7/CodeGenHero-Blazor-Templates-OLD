@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CodeGenHero.Template.Blazor5.Generators
 {
-    internal class RepositoryGenerator : BaseBlazorGenerator
+    public class RepositoryGenerator : BaseBlazorGenerator
     {
         public RepositoryGenerator(ICodeGenHeroInflector inflector) : base(inflector)
         {
@@ -289,8 +289,8 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\tIList<string> filterList = new List<string>(request.FilterList);");
             sb.AppendLine($"\tRunCustomLogicAfterGetQueryableList_{entityName}(ref qry, ref filterList);");
             sb.AppendLine("\tqry = qry.ApplyFilter(filterList);");
-            sb.AppendLine($"\tqry.ApplySort(request.Sort ?? (typeof(Artist).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))");
-            sb.AppendLine("\t\t.Take(request.PageSize).ToListAsync();");
+            sb.AppendLine($"\tqry = qry.ApplySort(request.Sort ?? (typeof(Artist).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))");
+            sb.AppendLine("\t\t.First().Name);");
             sb.AppendLine(string.Empty);
 
             sb.AppendLine("\tretVal.TotalCount = qry.Count();");
@@ -315,7 +315,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine($"\tvar retVal = GetQueryable<{entityName}>();");
             sb.AppendLine($"ApplyRelatedEntitiesType(ref retVal, relatedEntitiesType);");
             sb.AppendLine(string.Empty);
-            sb.AppendLine("return retVal");
+            sb.AppendLine("return retVal;");
             sb.AppendLine("}");
 
             sb.AppendLine(string.Empty);
@@ -395,7 +395,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             sb.AppendLine($"partial void RunCustomLogicAfterGetQueryableList_{tableName}(");
             sb.AppendLine($"\tref IQueryable<{tableName}> dbItems,");
-            sb.AppendLine("\tref IList<string> filterList");
+            sb.AppendLine("\tref IList<string> filterList)");
             sb.AppendLine(string.Empty);
 
             sb.AppendLine($"partial void RunCustomLogicAfterInsert_{tableName}({tableName} item, IRepositoryActionResult<{tableName}> result);");

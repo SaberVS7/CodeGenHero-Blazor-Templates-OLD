@@ -6,7 +6,9 @@ using CodeGenHero.Core;
 
 namespace CodeGenHero.Template.Blazor5.Templates
 {
-    internal class DTOTemplate : BaseBlazorTemplate
+    [Template(name: "DTO", version: "2021.11.12", uniqueTemplateIdGuid: "C97FAB8D-DB03-4F94-9C85-14D1F9B41AA7",
+        description: "Generates Data Transfer Objects based off provided Metadata Entities.")]
+    public class DTOTemplate : BaseBlazorTemplate
     {
         public DTOTemplate()
         {

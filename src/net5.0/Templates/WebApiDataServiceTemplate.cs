@@ -8,7 +8,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
 {
     [Template(name: "WebApiDataService", version: "2021.11.9", uniqueTemplateIdGuid: "DA87D00B-525F-487A-934A-0925A3F99DB9",
         description: "Generates the WebApiDataService implementation.")]
-    internal class WebApiDataServiceTemplate : BaseBlazorTemplate
+    public class WebApiDataServiceTemplate : BaseBlazorTemplate
     {
         public WebApiDataServiceTemplate()
         {
@@ -29,7 +29,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
         public string WebApiDataServiceClassName { get; set; }
 
         [TemplateVariable(defaultValue: Consts.WebApiDataServiceOutputFilepath_DEFAULT, hiddenIndicator: true)]
-        public string WebApiDataServiceOuputFilepath { get; set; }
+        public string WebApiDataServiceOutputFilepath { get; set; }
 
         [TemplateVariable(defaultValue: Consts.WebApiDataServiceApiRelativeURL_DEFAULT, description: Consts.WebApiDataServiceApiRelativeURL_DESC)]
         public string ApiRelativeURL { get; set; }
@@ -43,7 +43,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
             try
             {
                 string outputFile = TemplateVariablesManager.GetOutputFile(templateIdentity: ProcessModel.TemplateIdentity,
-                    fileName: Consts.OUT_WebApiDataServiceOuputFilepath_DEFAULT);
+                    fileName: Consts.OUT_WebApiDataServiceOutputFilepath_DEFAULT);
                 string filepath = outputFile;
 
                 var usings = new List<NamespaceItem>

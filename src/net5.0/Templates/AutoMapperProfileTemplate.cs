@@ -8,7 +8,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
 {
     [Template(name: "AutoMapperProfile", version: "2021.9.14", uniqueTemplateIdGuid: "7B0AA8DE-D2FB-4EFA-98E1-75FEB116A153",
         description: "Generates an Automapper Profile based off provided Metadata. Requires AutoMapper.Extensions.Microsoft.DependencyInjection NuGet package.")]
-    internal class AutoMapperProfileTemplate : BaseBlazorTemplate
+    public class AutoMapperProfileTemplate : BaseBlazorTemplate
     {
         public AutoMapperProfileTemplate()
         {

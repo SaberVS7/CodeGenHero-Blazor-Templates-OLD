@@ -8,7 +8,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
 {
     [Template(name: "BaseAPIController", version: "2021.9.14", uniqueTemplateIdGuid: "AF56140D-4926-4E6A-ADDB-49F3CFCD4A53",
         description: "Generates a Base API Controller class for anonymous API Controllers to inherit from.")]
-    internal class BaseAPIControllerTemplate : BaseBlazorTemplate
+    public class BaseAPIControllerTemplate : BaseBlazorTemplate
     {
         public BaseAPIControllerTemplate()
         {
@@ -60,9 +60,9 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     new NamespaceItem("Microsoft.AspNetCore.Http"),
                     new NamespaceItem("Microsoft.AspNetCore.Routing"),
                     new NamespaceItem("Microsoft.Extensions.Logging.Abstractions"),
-                    new NamespaceItem("Microsoft.AspNetCore.Http.Extensions;"),
-                    new NamespaceItem("{BaseNamespace}.Shared.DataService;"),
-                    new NamespaceItem("Enums = {BaseNamespace}.Shared.Constants.Enums")
+                    new NamespaceItem("Microsoft.AspNetCore.Http.Extensions"),
+                    new NamespaceItem($"{BaseNamespace}.Shared.DataService"),
+                    new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums")
                 };
 
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);

@@ -8,7 +8,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
 {
     [Template(name: "RepositoryCrudInterface", version: "2021.9.14", uniqueTemplateIdGuid: "5A7FE640-915D-4B08-BA8A-A82C33D69D09",
         description: "Generates a Create/Read/Update/Delete Interface for a Repository Class to implement.")]
-    internal class RepositoryCrudInterfaceTemplate : BaseBlazorTemplate
+    public class RepositoryCrudInterfaceTemplate : BaseBlazorTemplate
     {
         public RepositoryCrudInterfaceTemplate()
         {

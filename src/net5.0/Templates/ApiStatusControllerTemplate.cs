@@ -6,9 +6,9 @@ using System.Collections.Generic;
 
 namespace CodeGenHero.Template.Blazor5.Templates
 {
-    [Template(name: "APIController", version: "2021.11.12", uniqueTemplateIdGuid: "021B5127-262B-45FB-A3A7-7388B2EDFCA9",
+    [Template(name: "APIStatusController", version: "2021.11.12", uniqueTemplateIdGuid: "021B5127-262B-45FB-A3A7-7388B2EDFCA9",
         description: "Creates the API Status Controller class")]
-    internal class ApiStatusControllerTemplate : BaseBlazorTemplate
+    public class ApiStatusControllerTemplate : BaseBlazorTemplate
     {
         public ApiStatusControllerTemplate()
         {

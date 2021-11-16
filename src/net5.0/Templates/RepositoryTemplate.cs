@@ -8,7 +8,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
 {
     [Template(name: "Repository", version: "2021.9.14", uniqueTemplateIdGuid: "F51D4B1E-D1F8-45C4-BC9C-9E50B9090FBE",
         description: "Generates the Repository class. Can be used as a Base for custom Repository classes.")]
-    internal class RepositoryTemplate : BaseBlazorTemplate
+    public class RepositoryTemplate : BaseBlazorTemplate
     {
         public RepositoryTemplate()
         {

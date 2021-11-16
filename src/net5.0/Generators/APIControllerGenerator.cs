@@ -41,18 +41,18 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             sb.AppendLine($"\t\tprivate const string GET_LIST_ROUTE_NAME = \"{humanizedEntityName}{namespacePostfix}List\";");
             sb.AppendLine($"\t\tprivate {genericFactoryInterfaceClassName}<ent{namespacePostfix}.{humanizedEntityName}, dto{namespacePostfix}.{humanizedEntityName}> _factory;");
-            sb.AppendLine($"\t\tprivate int maxPageSize = {maxPageSize};");
+            sb.AppendLine($"\t\tprivate int MaxPageSize {{ get; set; }} = {maxPageSize};");
             sb.AppendLine(string.Empty);
 
             sb.Append(GenerateConstructor(className, namespacePostfix, entityName, repositoryInterfaceClassName, genericFactoryInterfaceClassName));
 
-            sb.Append(GenerateDelete(entity));
+            sb.Append(GenerateDelete(entity, entityName));
             sb.Append(GenerateGet(entity, namespacePostfix, entityName));
             sb.Append(GeneratePatch(entity, namespacePostfix, entityName));
             sb.Append(GeneratePost(entity, namespacePostfix, entityName));
             sb.Append(GeneratePut(entity, namespacePostfix, entityName));
 
-            sb.Append(GeneratePartialMethodSignatures(namespacePostfix, entityName));
+            sb.Append(GeneratePartialMethodSignatures(entity, namespacePostfix, entityName));
 
             sb.Append(GenerateFooter());
 
@@ -79,7 +79,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             return sb.ToString();
         }
 
-        private string GenerateDelete(IEntityType entity)
+        private string GenerateDelete(IEntityType entity, string entityName)
         {
             var methodSignature = GetSignatureWithoutFieldTypes("", entity.FindPrimaryKey(), lowercasePkNameFirstChar: true);
             var methodSignatureWithType = GetSignatureWithFieldTypes("", entity.FindPrimaryKey());
@@ -97,14 +97,14 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\t\t\treturn StatusCode(httpStatusCode, message);");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine($"\t\tvar result = await Repo.Delete_ArtworkAsync({methodSignature});");
+            sb.AppendLine($"\t\tvar result = await Repo.Delete_{entityName}Async({methodSignature});");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine("\t\tif (result.Status == cghrEnums.RepositoryActionStatus.Deleted)");
+            sb.AppendLine("\t\tif (result.Status == RepositoryActionStatus.Deleted)");
             sb.AppendLine("\t\t{");
             sb.AppendLine("\t\t\treturn NoContent();");
             sb.AppendLine("\t\t}");
-            sb.AppendLine("\t\telse if (result.Status == cghrEnums.RepositoryActionStatus.NotFound)");
+            sb.AppendLine("\t\telse if (result.Status == RepositoryActionStatus.NotFound)");
             sb.AppendLine("\t\t{");
             sb.AppendLine("\t\t\treturn PrepareNotFoundResponse();");
             sb.AppendLine("\t\t}");
@@ -177,11 +177,11 @@ namespace CodeGenHero.Template.Blazor5.Generators
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine("[HttpGet(\"{relatedEntitiesType:relatedEntitiesType=None}\", Name = GET_LIST_ROUTE_NAME)]");
+            sb.AppendLine("[HttpGet(template: \"{relatedEntitiesType:relatedEntitiesType=None}\", Name = GET_LIST_ROUTE_NAME)]");
             sb.AppendLine("[VersionedActionConstraint(allowedVersion: 1, order: 100)]");
             sb.AppendLine("public async Task<IActionResult> Get(Enums.RelatedEntitiesType relatedEntitiesType,");
             sb.AppendLine("\tstring sort = null, string fields = null, string filter = null,");
-            sb.AppendLine("\tint page = 1, int pageSize = maxPageSize)");
+            sb.AppendLine("\tint page = 1, int pageSize = 100)");
             sb.AppendLine("{");
 
             sb.AppendLine("\ttry");
@@ -195,24 +195,28 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\t\tvar filterList = GetListByDelimiter(filter);");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine("\t\tif (pageSize > maxPageSize)");
+            sb.AppendLine("\t\tif (pageSize > MaxPageSize)");
             sb.AppendLine("\t\t{");
-            sb.AppendLine("\t\t\tpageSize = maxPageSize;");
+            sb.AppendLine("\t\t\tpageSize = MaxPageSize;");
             sb.AppendLine("\t\t}");
             sb.AppendLine(string.Empty);
 
             sb.AppendLine("\t\tvar request = new RepositoryPageDataRequest(fieldList: fieldList,");
             sb.AppendLine("\t\t\tfilterList: filterList, page: page, pageSize: pageSize, sort: sort,");
             sb.AppendLine("\t\t\trelatedEntitiesType: relatedEntitiesType);");
+            sb.AppendLine(string.Empty);
 
             sb.AppendLine($"\t\tRepositoryPageDataResponse<IList<ent{namespacePostfix}.{entityName}>> response =");
             sb.AppendLine($"\t\t\tawait Repo.GetPageData_{entityName}Async(request);");
+            sb.AppendLine(string.Empty);
 
             sb.AppendLine("\t\tPageData paginationHeader = BuildPaginationHeader(nameof(Get), page: page,");
             sb.AppendLine("\t\t\ttotalCount: response.TotalCount, pageSize: response.PageSize, sort: response.Sort);");
+            sb.AppendLine(string.Empty);
 
             sb.AppendLine("\t\tHttpContextAccessor.HttpContext.Response.Headers.Add(\"Access-Control-Expose-Headers\", \"X-Pagination\");");
             sb.AppendLine("\t\tHttpContextAccessor.HttpContext.Response.Headers.Add(\"X-Pagination\", Newtonsoft.Json.JsonConvert.SerializeObject(paginationHeader));");
+            sb.AppendLine(string.Empty);
 
             sb.AppendLine("\t\tvar retVal = response.Data.Select(x => _factory.CreateDataShapedObject(x, fieldList));");
             sb.AppendLine("\t\treturn Ok(retVal);");
@@ -230,8 +234,10 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         #endregion Get Method Generators
 
-        private string GeneratePartialMethodSignatures(string namespacePostfix, string entityName)
+        private string GeneratePartialMethodSignatures(IEntityType entity, string namespacePostfix, string entityName)
         {
+            var entitySignature = GetSignatureWithFieldTypes(string.Empty, entity.FindPrimaryKey());
+
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
             sb.AppendLine($"partial void RunCustomLogicAfterInsert(ref ent{namespacePostfix}.{entityName} newDBItem, ref IRepositoryActionResult<ent{namespacePostfix}.{entityName}> result);");
@@ -243,7 +249,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine($"partial void RunCustomLogicAfterUpdatePut(ref ent{namespacePostfix}.{entityName} updatedDBItem, ref IRepositoryActionResult<ent{namespacePostfix}.{entityName}> result);");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine($"partial void RunCustomLogicBeforeUpdatePut(ref ent{namespacePostfix}.{entityName} updatedDBItem, int announcementId);");
+            sb.AppendLine($"partial void RunCustomLogicBeforeUpdatePut(ref ent{namespacePostfix}.{entityName} updatedDBItem, {entitySignature});");
             sb.AppendLine(string.Empty);
 
             sb.AppendLine($"partial void RunCustomLogicOnGetEntityByPK(ref ent{namespacePostfix}.{entityName} dbItem, int artworkId, waEnums.RelatedEntitiesType relatedEntitiesType);");
@@ -295,7 +301,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\t\tRunCustomLogicAfterUpdatePatch(ref updatedDBItem, ref result);");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine("\t\tif (result.Status == cghrEnums.RepositoryActionStatus.Updated)");
+            sb.AppendLine("\t\tif (result.Status == RepositoryActionStatus.Updated)");
             sb.AppendLine("\t\t{");
             sb.AppendLine("\t\t\tvar patchedDTOItem = _factory.Create(result.Entity); // Map the updated DB Entity to a DTO.");
             sb.AppendLine("\t\t\treturn Ok(patchedDTOItem);");
@@ -409,12 +415,12 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\t\tRunCustomLogicAfterUpdatePut(ref updatedDBItem, ref result);");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine("\t\tif (result.Status == cghrEnums.RepositoryActionStatus.Updated)");
+            sb.AppendLine("\t\tif (result.Status == RepositoryActionStatus.Updated)");
             sb.AppendLine("\t\t{");
             sb.AppendLine("\t\t\tvar updatedDTOItem = _factory.Create(result.Entity); // Map the updated DB Entity to a DTO");
             sb.AppendLine("\t\t\treturn Ok(updatedDTOItem);");
             sb.AppendLine("\t\t}");
-            sb.AppendLine("\t\telse if (result.Status == cghrEnums.RepositoryActionStatus.NotFound)");
+            sb.AppendLine("\t\telse if (result.Status == RepositoryActionStatus.NotFound)");
             sb.AppendLine("\t\t{");
             sb.AppendLine("\t\t\treturn NotFound();");
             sb.AppendLine("\t\t}");

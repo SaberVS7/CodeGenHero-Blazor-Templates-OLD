@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace CodeGenHero.Template.Blazor5.Generators
 {
-    class DTOGenerator : BaseBlazorGenerator
+    public class DTOGenerator : BaseBlazorGenerator
     {
         public DTOGenerator(ICodeGenHeroInflector inflector) : base(inflector)
         {
@@ -96,11 +96,11 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
                 if (!reverseFK.ClrType.Name.Equals("ICollection`1"))
                 {
-                    sb.Append($"public virtual {reverseFK.ForeignKey.PrincipalEntityType.ClrType.Name} {Inflector.Pascalize(reverseFK.Name)} {{ get; set; }} // One to One mapping"); // Foreign Key
+                    sb.AppendLine($"public virtual {reverseFK.ForeignKey.PrincipalEntityType.ClrType.Name} {Inflector.Pascalize(reverseFK.Name)} {{ get; set; }} // One to One mapping"); // Foreign Key
                 }
                 else
                 {
-                    sb.Append($"public virtual System.Collections.Generic.ICollection<{reverseFK.ForeignKey.DeclaringEntityType.ClrType.Name}> {reverseFK.Name} {{ get; set; }} = new List<{reverseFK.ForeignKey.DeclaringEntityType.ClrType.Name}>(); // Many to many mapping"); // Foreign Key
+                    sb.AppendLine($"public virtual System.Collections.Generic.ICollection<{reverseFK.ForeignKey.DeclaringEntityType.ClrType.Name}> {reverseFK.Name} {{ get; set; }} = new List<{reverseFK.ForeignKey.DeclaringEntityType.ClrType.Name}>(); // Many to many mapping"); // Foreign Key
                 }
                 sb.AppendLine(string.Empty);
             }

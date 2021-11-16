@@ -160,7 +160,7 @@
 
         public const string OUT_WebApiDataServiceInterfaceOuputFilepath_DEFAULT = "WebApiDataServiceInterfaceOuputFilepath";
 
-        public const string OUT_WebApiDataServiceOuputFilepath_DEFAULT = "WebApiDataServiceOutputFilepath";
+        public const string OUT_WebApiDataServiceOutputFilepath_DEFAULT = "WebApiDataServiceOutputFilepath";
 
         public const string OUT_ApiStatusControllerOutputFilepath_DEFAULT = "ApiStatusControllerOutputFilepath";
 

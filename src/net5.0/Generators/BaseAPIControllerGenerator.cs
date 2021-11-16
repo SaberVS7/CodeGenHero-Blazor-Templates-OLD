@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CodeGenHero.Template.Blazor5.Generators
 {
-    internal class BaseAPIControllerGenerator : BaseBlazorGenerator
+    public class BaseAPIControllerGenerator : BaseBlazorGenerator
     {
         public BaseAPIControllerGenerator(ICodeGenHeroInflector inflector) : base(inflector)
         {
@@ -91,12 +91,12 @@ namespace CodeGenHero.Template.Blazor5.Generators
                     var prevLink = page > 1 ? LinkGenerator.GetUriByAction(
                         httpContext: HttpContextAccessor.HttpContext,
                         action: action,
-                        values: new { page = page - 1, pageSize = pageSize, sort = sort }) : "";
+                        values: new { page = page - 1, pageSize = pageSize, sort = sort }) : """";
 
                     var nextLink = page < totalPages ? LinkGenerator.GetUriByAction(
                         httpContext: HttpContextAccessor.HttpContext,
                         action: action,
-                        values: new { page = page + 1, pageSize = pageSize, sort = sort }) : "";
+                        values: new { page = page + 1, pageSize = pageSize, sort = sort }) : """";
 
                     return new PageData(currentPage: page, nextPageLink: nextLink, pageSize: pageSize, previousPageLink: prevLink, totalCount: totalCount, totalPages: totalPages);
                 }";
@@ -127,14 +127,14 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
                     return pathAndQuery;
                 }";
-            string prepareExpectationFailedResponse = $@"
+            string prepareExpectationFailedResponse = @"
                 protected IActionResult PrepareExpectationFailedResponse(Exception ex)
                 {{
                     var args = new object[] {{ 
                         (int)StatusCodes.Status417ExpectationFailed,
                         HttpContext.Request.GetEncodedUrl() }};
 
-                    Log.LogWarning(eventId: (int){namespacePostfix}Enums.EventId.Warn_WebApi,
+                    Log.LogWarning(eventId: (int)Enums.EventId.Warn_WebApi,
                         exception: ex,
                         message: ""Web API action failed. {{httpResponseStatusCode}}:{{url}}"",
                         args: args);
@@ -142,13 +142,13 @@ namespace CodeGenHero.Template.Blazor5.Generators
                     var retVal = StatusCode(StatusCodes.Status417ExpectationFailed, ex);
                     return retVal;
                 }}";
-            string prepareInternalServerErrorResponse = $@"
+            string prepareInternalServerErrorResponse = @"
                 protected IActionResult PrepareInternalServerErrorResponse(Exception ex)
                 {{
                     var args = new object[] {{
                         (int)StatusCodes.Status500InternalServerError,
                         HttpContext.Request.GetEncodedUrl() }};
-                    Log.LogError(eventId: (int){namespacePostfix}Enums.EventId.Exception_WebApi,
+                    Log.LogError(eventId: (int)Enums.EventId.Exception_WebApi,
                         exception: ex,
                         message: $""{{ex.Message}} {{httpResponseStatusCode}}:{{url}}"",
                         args: args);
@@ -157,13 +157,13 @@ namespace CodeGenHero.Template.Blazor5.Generators
                         value: System.Diagnostics.Debugger.IsAttached ? ex : null);
                     return retVal;
                 }}";
-            string prepareNotFoundResponse = $@"
+            string prepareNotFoundResponse = @"
                 protected IActionResult PrepareNotFoundResponse()
                 {{
                     var args = new object[] {{
                         ""httpResponseStatusCode"", (int)StatusCodes.Status404NotFound ,
                         ""url"", HttpContext.Request.GetEncodedUrl() }};
-                Log.LogWarning(eventId: (int){namespacePostfix}Enums.EventId.Warn_WebApi,
+                Log.LogWarning(eventId: (int)Enums.EventId.Warn_WebApi,
                     exception: null,
                     message: ""Unable to find requested object via Web API. {{httpResponseStatusCode}}:{{url}}"",
                     args: args);

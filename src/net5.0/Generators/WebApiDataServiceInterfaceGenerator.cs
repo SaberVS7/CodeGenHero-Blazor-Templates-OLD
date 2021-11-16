@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CodeGenHero.Template.Blazor5.Generators
 {
-    internal class WebApiDataServiceInterfaceGenerator : BaseBlazorGenerator
+    public class WebApiDataServiceInterfaceGenerator : BaseBlazorGenerator
     {
         public WebApiDataServiceInterfaceGenerator(ICodeGenHeroInflector inflector) : base(inflector)
         {
@@ -56,7 +56,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 sb.AppendLine(methodSecondLine);
                 sb.AppendLine(string.Empty);
 
-                sb.AppendLine($"Task<IList<xDTO.Artist>> GetAllPagesArtistsAsync(List<IFilterCriterion> filterCriteria, string sort = null,");
+                sb.AppendLine($"Task<IList<xDTO.{entityName}>> GetAllPages{pluralEntityName}Async(List<IFilterCriterion> filterCriteria, string sort = null,");
                 sb.AppendLine(methodSecondLine);
                 sb.AppendLine(string.Empty);
             }

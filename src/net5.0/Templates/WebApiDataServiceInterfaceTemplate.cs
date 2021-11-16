@@ -8,7 +8,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
 {
     [Template(name: "WebApiDataServiceInterface", version: "2021.11.9", uniqueTemplateIdGuid: "FB79D688-1931-4893-82F6-B7AD98BC5754",
         description: "Generates the Interface for the WebApiDataService to implement.")]
-    internal class WebApiDataServiceInterfaceTemplate : BaseBlazorTemplate
+    public class WebApiDataServiceInterfaceTemplate : BaseBlazorTemplate
     {
         public WebApiDataServiceInterfaceTemplate()
         {

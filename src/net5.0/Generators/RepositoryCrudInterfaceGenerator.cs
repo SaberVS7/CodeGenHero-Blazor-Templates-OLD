@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CodeGenHero.Template.Blazor5.Generators
 {
-    internal class RepositoryCrudInterfaceGenerator : BaseBlazorGenerator
+    public class RepositoryCrudInterfaceGenerator : BaseBlazorGenerator
     {
         public RepositoryCrudInterfaceGenerator(ICodeGenHeroInflector inflector) : base(inflector)
         {
