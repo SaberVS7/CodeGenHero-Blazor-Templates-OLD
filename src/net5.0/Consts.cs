@@ -101,6 +101,9 @@
         public const string PTG_ApiStatusControllerClassName_DEFAULT = "{namespacePostfix}ApiStatusController";
         public const string PTG_ApiStatusControllerClassName_DESC = "The name of the API Status Controller class. Should be promoted to Global.";
 
+        public const string PTG_AdminListPageViewModelClassName_DEFAULT = "{namespacePostfix}[tablename]ListViewModel";
+        public const string PTG_AdminListPageViewModelClassName_DESC = "The name of the Admin List Page Viewmodel class. Should be promoted to Global";
+
         #endregion Class Names
 
         #region Output Filepaths
@@ -129,6 +132,10 @@
 
         public const string ApiStatusControllerOutputFilepath_DEFAULT = "Blazor\\API\\{NamespacePostfix}ApiStatusController.cs";
 
+        public const string AdminListPageOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]List.razor";
+
+        public const string AdminListPageViewModelOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]List.razor.cs";
+
         #endregion
 
         #region Output Variable Names
@@ -156,6 +163,10 @@
         public const string OUT_WebApiDataServiceOuputFilepath_DEFAULT = "WebApiDataServiceOutputFilepath";
 
         public const string OUT_ApiStatusControllerOutputFilepath_DEFAULT = "ApiStatusControllerOutputFilepath";
+
+        public const string OUT_AdminListPageOutputFilepath_DEFAULT = "AdminListPageOutputFilepath";
+
+        public const string OUT_AdminListPageViewModelOutputFilepath_DEFAULT = "AdminListPageViewModelOutputFilepath";
 
         #endregion
 

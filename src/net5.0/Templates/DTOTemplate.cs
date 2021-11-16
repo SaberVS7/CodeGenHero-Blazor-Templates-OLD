@@ -37,6 +37,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
                 var filteredEntityTypes = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
 
                 var usings = new List<NamespaceItem>(); // Empty, but we need to provide one.
+                var generator = new DTOGenerator(inflector: Inflector);
 
                 foreach (var entityType in filteredEntityTypes)
                 {
@@ -44,8 +45,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     string outputFile = TemplateVariablesManager.GetOutputFile(templateIdentity: ProcessModel.TemplateIdentity,
                     fileName: Consts.OUT_DTOFilePath_DEFAULTVALUE);
                     string filepath = TokenReplacements(outputFile, entityType);
-
-                    var generator = new DTOGenerator(inflector: Inflector);
+                    
                     var generatedCode = generator.Generate(usings, DtoNamespace, NamespacePostfix, entityType, excludedEntityNavigations, IncludeRelatedObjects, className);
 
                     retVal.Files.Add(new OutputFile()

@@ -87,6 +87,8 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums")
                 };
 
+                var generator = new APIControllerGenerator(inflector: Inflector);
+
                 foreach (var entity in filteredEntityTypes)
                 {
                     string outputfile = TemplateVariablesManager.GetOutputFile(templateIdentity: ProcessModel.TemplateIdentity,
@@ -97,7 +99,6 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     // Individualize the Class Name
                     string className = TokenReplacements(APIControllerClassName, entity);
 
-                    var generator = new APIControllerGenerator(inflector: Inflector);
                     string generatedCode = generator.Generate(usings, APIControllerNamespace, NamespacePostfix, entity, maxRequestPerPageOverrides, className, BaseAPIControllerClassName, RepositoryInterfaceClassName, GenericFactoryInterfaceClassName);
 
                     retVal.Files.Add(new OutputFile()
