@@ -111,7 +111,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             foreach (var entity in entities)
             {
                 string entityName = entity.ClrType.Name;
-                string signature = GetSignatureWithFieldTypes(string.Empty, entity.FindPrimaryKey());
+                string signature = GetMethodParameterSignature(entity);
 
                 sb.AppendLine($"Task<IHttpCallResultCGHT<xDTO.{entityName}>> Get{entityName}Async({signature},");
                 sb.AppendLine("\tEnums.RelatedEntitiesType relatedEntitiesType = Enums.RelatedEntitiesType.None);");
@@ -176,7 +176,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             foreach (var entity in entities)
             {
                 string entityName = entity.ClrType.Name;
-                string signature = GetSignatureWithFieldTypes(string.Empty, entity.FindPrimaryKey());
+                string signature = GetMethodParameterSignature(entity);
 
                 sb.AppendLine($"Task<IHttpCallResultCGHT<xDTO.{entityName}>> Delete{entityName}Async({signature});");
                 sb.AppendLine(string.Empty);
