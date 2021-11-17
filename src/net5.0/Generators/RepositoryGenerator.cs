@@ -26,7 +26,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             StringBuilder sb = new StringBuilder();
             sb.Append(GenerateHeader(usings, classNamespace));
 
-            sb.AppendLine($"\tpublic abstract partial class {className} : {repositoryInterfaceClassName}");
+            sb.AppendLine($"\tpublic partial class {className} : {repositoryInterfaceClassName}");
             sb.AppendLine("\t{");
             sb.AppendLine($"\tprivate {dbContextName} _ctx;");
             sb.Append(GenerateConstructor(className, dbContextName));
@@ -39,8 +39,29 @@ namespace CodeGenHero.Template.Blazor5.Generators
             {
                 string entityName = entity.ClrType.Name;
                 string tableNamePlural = Inflector.Pluralize(entity.ClrType.Name);
-                string whereClause = WhereClause(objectInstancePrefix: null, indent: "", entity.Properties, entity.FindPrimaryKey(), useLowerForFirstCharOfPropertyName: true);
-                string whereClauseWithObjectInstancePrefix = WhereClause(objectInstancePrefix: "item", indent: "", entity.Properties, entity.FindPrimaryKey(), useLowerForFirstCharOfPropertyName: false);
+                var primaryKeys = GetPrimaryKeys(entity);
+
+                StringBuilder whereClauseSB = new StringBuilder();
+                StringBuilder whereClauseWithObjectSB = new StringBuilder();
+                var clauseStarter = "x => ";
+                var clauseDivider = " && ";
+                whereClauseSB.Append(clauseStarter);
+                whereClauseWithObjectSB.Append(clauseStarter);
+                var pkCount = primaryKeys.Count();
+                foreach (var pk in primaryKeys)
+                {
+                    var cpk = Inflector.Camelize(pk);
+                    whereClauseSB.Append($"x.{pk} == {cpk}");
+                    whereClauseWithObjectSB.Append($"x.{pk} == item.{pk}");
+                    pkCount--;
+                    if (pkCount > 0)
+                    {
+                        whereClauseSB.Append(clauseDivider);
+                        whereClauseWithObjectSB.Append(clauseDivider);
+                    }
+                }
+                string whereClause = whereClauseSB.ToString();
+                string whereClauseWithObjectInstancePrefix = whereClauseWithObjectSB.ToString();
 
                 string methodParameterSignature = GetMethodParameterSignature(entity);
                 string methodParameterSignatureWithoutFieldTypes = GetMethodParametersWithoutTypes(entity);
@@ -51,7 +72,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 sb.Append(GenerateInsertOperation(entityName));
                 sb.Append(GenerateGetQueryable(entityName));
                 sb.Append(GenerateGetPageData(entityName));
-                sb.Append(GenerateGetFirstOrDefault(entityName, tableNamePlural, methodParameterSignature, methodParameterSignatureWithoutFieldTypes, whereClause, whereClauseWithObjectInstancePrefix));
+                sb.Append(GenerateGetFirstOrDefault(entityName, methodParameterSignature, methodParameterSignatureWithoutFieldTypes, whereClause, whereClauseWithObjectInstancePrefix));
                 sb.Append(GenerateUpdateOperation(entityName, tableNamePlural, whereClauseWithObjectInstancePrefix));
                 sb.Append(GenerateDeleteOperations(entityName, tableNamePlural, whereClause, whereClauseWithObjectInstancePrefix, methodParameterSignature));
                 sb.Append(GeneratePartialMethodSignatures(entityName, methodParameterSignature));
@@ -264,15 +285,16 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         #endregion Generic Operations Generators
 
-        private string GenerateGetFirstOrDefault(string tableName, string tableNamePlural,
+        private string GenerateGetFirstOrDefault(string tableName,
             string methodParameterSignature,
             string methodParameterSignatureWithoutFieldTypes,
-            string whereClause, string whereClauseWithObjectInstancePrefix)
+            string whereClause,
+            string whereClauseWithObjectInstancePrefix)
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
             sb.Append(GenerateGetFirstOrDefaultByPrimaryKey(tableName, methodParameterSignature, methodParameterSignatureWithoutFieldTypes, whereClause));
-            sb.Append(GenerateGetFirstOrDefaultByObject(tableName, tableNamePlural, whereClauseWithObjectInstancePrefix));
+            sb.Append(GenerateGetFirstOrDefaultByObject(tableName, whereClauseWithObjectInstancePrefix));
 
             return sb.ToString();
         }
@@ -291,7 +313,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\tIList<string> filterList = new List<string>(request.FilterList);");
             sb.AppendLine($"\tRunCustomLogicAfterGetQueryableList_{entityName}(ref qry, ref filterList);");
             sb.AppendLine("\tqry = qry.ApplyFilter(filterList);");
-            sb.AppendLine($"\tqry = qry.ApplySort(request.Sort ?? (typeof(Artist).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))");
+            sb.AppendLine($"\tqry = qry.ApplySort(request.Sort ?? (typeof({entityName}).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))");
             sb.AppendLine("\t\t.First().Name);");
             sb.AppendLine(string.Empty);
 
@@ -342,11 +364,12 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         #region Get First or Default Generators
 
-        private string GenerateGetFirstOrDefaultByObject(string tableName, string tableNamePlural, string whereClauseWithObjectInstancePrefix)
+        private string GenerateGetFirstOrDefaultByObject(string tableName, string whereClauseWithObjectInstancePrefix)
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine($"public async Task<{tableName}> GetFirstOrDefaultAsync({tableName} item, Enums.RelatedEntitiesType relatedEntitiesType)");
+            sb.AppendLine($"public async Task<{tableName}> GetFirstOrDefaultAsync(");
+            sb.AppendLine($"\t{tableName} item, Enums.RelatedEntitiesType relatedEntitiesType)");
             sb.AppendLine("{");
 
             sb.AppendLine($"\tvar qry = GetQueryable_{tableName}(relatedEntitiesType)");
@@ -375,7 +398,9 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\tqry = qry.AsNoTracking();");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine($"\tvar dbItem = await qry.Where({whereClause}).FirstOrDefaultAsync();");
+            sb.AppendLine("\tvar dbItem = await qry");
+            sb.AppendLine($"\t\t.Where({whereClause})");
+            sb.AppendLine($"\t\t.FirstOrDefaultAsync();");
             sb.AppendLine("\tif (!(dbItem is null))");
             sb.AppendLine("\t{");
             sb.AppendLine($"\t\tRunCustomLogicOnGetEntityByPK_{tableName}(ref dbItem, {methodParameterSignatureWithoutFieldTypes}, relatedEntitiesType);");
@@ -397,7 +422,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             sb.AppendLine($"partial void RunCustomLogicAfterGetQueryableList_{tableName}(");
             sb.AppendLine($"\tref IQueryable<{tableName}> dbItems,");
-            sb.AppendLine("\tref IList<string> filterList)");
+            sb.AppendLine("\tref IList<string> filterList);");
             sb.AppendLine(string.Empty);
 
             sb.AppendLine($"partial void RunCustomLogicAfterInsert_{tableName}({tableName} item, IRepositoryActionResult<{tableName}> result);");
@@ -414,6 +439,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             sb.AppendLine("partial void ApplyRelatedEntitiesType(");
             sb.AppendLine($"\tref IQueryable<{tableName}> qry, Enums.RelatedEntitiesType relatedEntitiesType);");
+            sb.AppendLine(string.Empty);
 
             return sb.ToString();
         }
@@ -425,7 +451,8 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine($"public async Task<IRepositoryActionResult<{entityName}>> UpdateAsync({entityName} item)");
             sb.AppendLine("{");
 
-            sb.AppendLine($"var oldItem = await _ctx.{tableNamePlural}.FirstOrDefaultAsync({whereClauseWithObjectInstancePrefix});");
+            sb.AppendLine($"var oldItem = await _ctx.{tableNamePlural}");
+            sb.AppendLine($"\t.FirstOrDefaultAsync({whereClauseWithObjectInstancePrefix});");
             sb.AppendLine($"var result = await UpdateAsync<{entityName}>(item, oldItem);");
             sb.AppendLine($"RunCustomLogicAfterUpdate_{entityName}(newItem: item, oldItem: oldItem, result: result);");
             sb.AppendLine(string.Empty);
@@ -446,7 +473,9 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine($"public async Task<IRepositoryActionResult<{entityName}>> DeleteAsync({entityName} item)");
             sb.AppendLine("{");
 
-            sb.AppendLine($"\treturn await DeleteAsync<{entityName}>(_ctx.{tableNamePlural}.Where({whereClauseWithObjectInstancePrefix}).FirstOrDefault());");
+            sb.AppendLine($"\treturn await DeleteAsync<{entityName}>(_ctx.{tableNamePlural}");
+            sb.AppendLine($"\t\t.Where({whereClauseWithObjectInstancePrefix})");
+            sb.AppendLine($"\t\t.FirstOrDefault());");
 
             sb.AppendLine("}");
             sb.AppendLine(string.Empty);
@@ -460,7 +489,9 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine($"public async Task<IRepositoryActionResult<{entityName}>> Delete_{entityName}Async({methodParameterSignature})");
             sb.AppendLine("{");
 
-            sb.AppendLine($"\treturn await DeleteAsync<{entityName}>(_ctx.{tableNamePlural}.Where({whereClause}).FirstOrDefault());");
+            sb.AppendLine($"\treturn await DeleteAsync<{entityName}>(_ctx.{tableNamePlural}");
+            sb.AppendLine($"\t\t.Where({whereClause})");
+            sb.AppendLine($"\t\t.FirstOrDefault());");
 
             sb.AppendLine("}");
             sb.AppendLine(string.Empty);
