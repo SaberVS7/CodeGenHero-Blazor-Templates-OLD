@@ -53,7 +53,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     new NamespaceItem("System"),
                     new NamespaceItem("System.Linq"),
                     new NamespaceItem("System.Threading.Tasks"),
-                    new NamespaceItem($"cghEnums = {BaseNamespace}.Repository.Enums"),
+                    new NamespaceItem($"cghEnums = {BaseNamespace}.Repository.Infrastructure.Enums"),
                     new NamespaceItem(EntitiesNamespace),
                     new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums"),
                     new NamespaceItem("System.Collections.Generic")

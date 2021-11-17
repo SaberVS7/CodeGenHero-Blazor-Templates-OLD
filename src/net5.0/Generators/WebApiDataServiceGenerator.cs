@@ -84,9 +84,9 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 sb.AppendLine("\t{");
 
                 sb.AppendLine("\t\tIFilterCriterion filterCriterion = new FilterCriterion(");
-                sb.AppendLine($"\t\t\tnameof(xDTO.{entityName}.IsActive),");
-                sb.AppendLine("\t\t\tEnums.CriterionCondition.IsEqualTo,");
-                sb.AppendLine("\t\t\tisActive");
+                sb.AppendLine($"\t\t\tfieldName: nameof(xDTO.{entityName}.IsActive),");
+                sb.AppendLine("\t\t\tcondition: Enums.CriterionCondition.IsEqualTo,");
+                sb.AppendLine("\t\t\tvalue: isActive");
                 sb.AppendLine(string.Empty);
 
                 sb.AppendLine("\t\tfilterCriteria.Add(filterCriterion);");
@@ -283,7 +283,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 
                 sb.AppendLine($"\tvar retVal = await SerializationHelper.SerializeCallResultsPut<xDTO.{entityName}>(");
                 sb.AppendLine("\t\tLog, HttpClient,");
-                sb.Append($"\t\t$\"{apiUrl}/{entityName}");
+                sb.Append($"$\"{apiUrl}/{entityName}");
                 foreach (var key in primaryKeys)
                 {
                     sb.Append($"/{{item.{key}}}");
