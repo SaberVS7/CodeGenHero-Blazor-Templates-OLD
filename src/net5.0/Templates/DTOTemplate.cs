@@ -38,7 +38,10 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     excludeRegExPattern: RegexExclude, includeRegExPattern: RegexInclude);
                 var filteredEntityTypes = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
 
-                var usings = new List<NamespaceItem>(); // Empty, but we need to provide one.
+                var usings = new List<NamespaceItem>
+                {
+                    new NamespaceItem("System.Collections.Generic")
+                };
                 var generator = new DTOGenerator(inflector: Inflector);
 
                 foreach (var entityType in filteredEntityTypes)
