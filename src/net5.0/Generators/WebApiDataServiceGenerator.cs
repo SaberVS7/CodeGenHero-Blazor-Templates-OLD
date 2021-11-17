@@ -215,9 +215,8 @@ namespace CodeGenHero.Template.Blazor5.Generators
             foreach (var entity in entities)
             {
                 string entityName = entity.ClrType.Name;
-                var pk = entity.FindPrimaryKey();
-                string fieldSignature = GetSignatureWithFieldTypes(string.Empty, pk);
-                string signature = GetSignatureWithoutFieldTypes(string.Empty, pk);
+                string fieldSignature = GetMethodParameterSignature(entity);
+                string signature = GetMethodParametersWithoutTypes(entity, "/");
 
                 sb.AppendLine($"public async Task<IHttpCallResultCGHT<xDTO.{entityName}>> Get{entityName}Async(");
                 sb.AppendLine($"\t{fieldSignature}, Enums.RelatedEntitiesType relatedEntitiesType)");
