@@ -129,47 +129,47 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 }";
             string prepareExpectationFailedResponse = @"
                 protected IActionResult PrepareExpectationFailedResponse(Exception ex)
-                {{
-                    var args = new object[] {{ 
+                {
+                    var args = new object[] {
                         (int)StatusCodes.Status417ExpectationFailed,
-                        HttpContext.Request.GetEncodedUrl() }};
+                        HttpContext.Request.GetEncodedUrl() };
 
                     Log.LogWarning(eventId: (int)Enums.EventId.Warn_WebApi,
                         exception: ex,
-                        message: ""Web API action failed. {{httpResponseStatusCode}}:{{url}}"",
+                        message: ""Web API action failed. {httpResponseStatusCode}:{url}"",
                         args: args);
 
                     var retVal = StatusCode(StatusCodes.Status417ExpectationFailed, ex);
                     return retVal;
-                }}";
+                }";
             string prepareInternalServerErrorResponse = @"
                 protected IActionResult PrepareInternalServerErrorResponse(Exception ex)
-                {{
-                    var args = new object[] {{
+                {
+                    var args = new object[] {
                         (int)StatusCodes.Status500InternalServerError,
-                        HttpContext.Request.GetEncodedUrl() }};
+                        HttpContext.Request.GetEncodedUrl() };
                     Log.LogError(eventId: (int)Enums.EventId.Exception_WebApi,
                         exception: ex,
-                        message: $""{{ex.Message}} {{httpResponseStatusCode}}:{{url}}"",
+                        message: $""{ex.Message} {httpResponseStatusCode}:{url}"",
                         args: args);
 
                     var retVal = StatusCode(StatusCodes.Status500InternalServerError,
                         value: System.Diagnostics.Debugger.IsAttached ? ex : null);
                     return retVal;
-                }}";
+                }";
             string prepareNotFoundResponse = @"
                 protected IActionResult PrepareNotFoundResponse()
-                {{
-                    var args = new object[] {{
+                {
+                    var args = new object[] {
                         ""httpResponseStatusCode"", (int)StatusCodes.Status404NotFound ,
-                        ""url"", HttpContext.Request.GetEncodedUrl() }};
+                        ""url"", HttpContext.Request.GetEncodedUrl() };
                 Log.LogWarning(eventId: (int)Enums.EventId.Warn_WebApi,
                     exception: null,
-                    message: ""Unable to find requested object via Web API. {{httpResponseStatusCode}}:{{url}}"",
+                    message: ""Unable to find requested object via Web API. {httpResponseStatusCode}:{url}"",
                     args: args);
 
                     return NotFound();
-                }}";
+                }";
             string OnActionExecuting = @"
                 protected bool OnActionExecuting(out int httpStatusCode, out string message, [CallerMemberName] string methodName = null)
                 {

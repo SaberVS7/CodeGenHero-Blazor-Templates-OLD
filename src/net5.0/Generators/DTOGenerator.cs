@@ -100,7 +100,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 }
                 else
                 {
-                    sb.AppendLine($"public virtual System.Collections.Generic.ICollection<{reverseFK.ForeignKey.DeclaringEntityType.ClrType.Name}> {reverseFK.Name} {{ get; set; }} = new List<{reverseFK.ForeignKey.DeclaringEntityType.ClrType.Name}>(); // Many to many mapping"); // Foreign Key
+                    sb.AppendLine($"public virtual ICollection<{reverseFK.ForeignKey.DeclaringEntityType.ClrType.Name}> {reverseFK.Name} {{ get; set; }} = new List<{reverseFK.ForeignKey.DeclaringEntityType.ClrType.Name}>(); // Many to many mapping"); // Foreign Key
                 }
                 sb.AppendLine(string.Empty);
             }
