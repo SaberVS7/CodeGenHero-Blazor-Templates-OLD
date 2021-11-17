@@ -26,7 +26,6 @@ namespace CodeGenHero.Template.Blazor5.Generators
             string genericFactoryInterfaceClassName)
         {
             var entityName = $"{entity.ClrType.Name}";
-            var humanizedEntityName = $"{Inflector.Humanize(entityName)}";
 
             // Set max page size.
             var maxPageSize = GetMaxPageSize(entity, maxRequestPerPageOverrides);
@@ -39,8 +38,8 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine($"\tpublic partial class {className} : {baseAPIControllerClassName}");
             sb.AppendLine("\t{");
 
-            sb.AppendLine($"\t\tprivate const string GET_LIST_ROUTE_NAME = \"{humanizedEntityName}{namespacePostfix}List\";");
-            sb.AppendLine($"\t\tprivate {genericFactoryInterfaceClassName}<ent{namespacePostfix}.{humanizedEntityName}, dto{namespacePostfix}.{humanizedEntityName}> _factory;");
+            sb.AppendLine($"\t\tprivate const string GET_LIST_ROUTE_NAME = \"{entityName}{namespacePostfix}List\";");
+            sb.AppendLine($"\t\tprivate {genericFactoryInterfaceClassName}<ent{namespacePostfix}.{entityName}, dto{namespacePostfix}.{entityName}> _factory;");
             sb.AppendLine($"\t\tprivate int MaxPageSize {{ get; set; }} = {maxPageSize};");
             sb.AppendLine(string.Empty);
 
@@ -81,11 +80,12 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         private string GenerateDelete(IEntityType entity, string entityName)
         {
-            var methodSignature = GetSignatureWithoutFieldTypes("", entity.FindPrimaryKey(), lowercasePkNameFirstChar: true);
-            var methodSignatureWithType = GetSignatureWithFieldTypes("", entity.FindPrimaryKey());
+            var routeSignature = GetMethodParametersWithoutTypes(entity, "}/{");
+            var methodSignature = GetMethodParametersWithoutTypes(entity);
+            var methodSignatureWithType = GetMethodParameterSignature(entity);
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine($"[HttpDelete(\"{{{methodSignature}}}\")]");
+            sb.AppendLine($"[HttpDelete(\"{{{routeSignature}}}\")]");
             sb.AppendLine("[VersionedActionConstraint(allowedVersion: 1, order: 100)]");
             sb.AppendLine($"public async Task<IActionResult> Delete({methodSignatureWithType})");
             sb.AppendLine("{");
@@ -137,12 +137,13 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         private string GenerateGetByPK(IEntityType entity, string namespacePostfix, string entityName)
         {
-            var methodSignature = GetSignatureWithoutFieldTypes("", entity.FindPrimaryKey(), lowercasePkNameFirstChar: true);
-            var methodSignatureWithType = GetSignatureWithFieldTypes("", entity.FindPrimaryKey());
+            var routeSignature = GetMethodParametersWithoutTypes(entity, "}/{");
+            var methodSignature = GetMethodParametersWithoutTypes(entity);
+            var methodSignatureWithType = GetMethodParameterSignature(entity);
 
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine($"[HttpGet(template: \"ById/{{{methodSignature}}}/{{relatedEntitiesType:relatedEntitiesType=None}}\")]");
+            sb.AppendLine($"[HttpGet(template: \"ById/{{{routeSignature}}}/{{relatedEntitiesType:relatedEntitiesType=None}}\")]");
             sb.AppendLine("[VersionedActionConstraint(allowedVersion: 1, order: 100)]");
             sb.AppendLine($"public async Task<IActionResult> Get({methodSignatureWithType}, waEnums.RelatedEntitiesType relatedEntitiesType)");
             sb.AppendLine("{");
@@ -236,7 +237,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         private string GeneratePartialMethodSignatures(IEntityType entity, string namespacePostfix, string entityName)
         {
-            var entitySignature = GetSignatureWithFieldTypes(string.Empty, entity.FindPrimaryKey());
+            var entitySignature = GetMethodParameterSignature(entity);
 
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
@@ -252,7 +253,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine($"partial void RunCustomLogicBeforeUpdatePut(ref ent{namespacePostfix}.{entityName} updatedDBItem, {entitySignature});");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine($"partial void RunCustomLogicOnGetEntityByPK(ref ent{namespacePostfix}.{entityName} dbItem, int artworkId, waEnums.RelatedEntitiesType relatedEntitiesType);");
+            sb.AppendLine($"partial void RunCustomLogicOnGetEntityByPK(ref ent{namespacePostfix}.{entityName} dbItem, {entitySignature}, Enums.RelatedEntitiesType relatedEntitiesType);");
             sb.AppendLine(string.Empty);
 
             return sb.ToString();
@@ -260,13 +261,14 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         private string GeneratePatch(IEntityType entity, string namespacePostfix, string entityName)
         {
-            var methodSignature = GetSignatureWithoutFieldTypes("", entity.FindPrimaryKey(), lowercasePkNameFirstChar: true);
-            var methodSignatureWithType = GetSignatureWithFieldTypes("", entity.FindPrimaryKey());
-            var pascalizedMethodSignature = Inflector.Pascalize(methodSignature);
+            var routeSignature = GetMethodParametersWithoutTypes(entity, "}/{");
+            var methodSignature = GetMethodParametersWithoutTypes(entity);
+            var methodSignatureWithType = GetMethodParameterSignature(entity);
+            var primaryKeys = GetPrimaryKeys(entity);
 
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine($"[HttpPatch(\"{{{methodSignature}}}\")]");
+            sb.AppendLine($"[HttpPatch(\"{{{routeSignature}}}\")]");
             sb.AppendLine("[VersionedActionConstraint(allowedVersion: 1, order: 100)]");
             sb.AppendLine($"public async Task<IActionResult> Patch({methodSignatureWithType}, [FromBody] JsonPatchDocument<dto{namespacePostfix}.{entityName}> patchDocument)");
             sb.AppendLine("{");
@@ -292,7 +294,12 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             sb.AppendLine("\t\t// Apply changes to the DTO");
             sb.AppendLine("\t\tpatchDocument.ApplyTo(dtoItem);");
-            sb.AppendLine($"\t\tdtoItem.{pascalizedMethodSignature} = {methodSignature};");
+            foreach(var pk in primaryKeys)
+            {
+                var ppk = Inflector.Pascalize(pk);
+                var cpk = Inflector.Camelize(pk);
+                sb.AppendLine($"\t\tdtoItem.{ppk} = {cpk};");
+            }
             sb.AppendLine(string.Empty);
 
             sb.AppendLine("\t\t// Map the DTO with applied changes back to the DB Entity and perform the update.");
@@ -323,8 +330,19 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         private string GeneratePost(IEntityType entity, string namespacePostfix, string entityName)
         {
-            var methodSignature = GetSignatureWithoutFieldTypes("", entity.FindPrimaryKey(), lowercasePkNameFirstChar: true);
-            var pascalizedMethodSignature = Inflector.Pascalize(methodSignature);
+            var primaryKeys = GetPrimaryKeys(entity);
+            StringBuilder uriValueSB = new StringBuilder();
+            var pkCount = primaryKeys.Count();
+            foreach(var pk in primaryKeys)
+            {
+                uriValueSB.Append($"newDTOItem.{pk}");
+                pkCount--;
+                if (pkCount > 0)
+                {
+                    uriValueSB.Append(", ");
+                }
+            }
+            string uriValue = uriValueSB.ToString();
 
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
@@ -360,7 +378,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\t\t\t\thttpContext: HttpContextAccessor.HttpContext,");
             sb.AppendLine("\t\t\t\taction: nameof(Get),");
             sb.AppendLine("\t\t\t\tcontroller: null, // Stay in this controller");
-            sb.AppendLine($"\t\t\t\tvalues: new {{ newDTOItem.{pascalizedMethodSignature} }}");
+            sb.AppendLine($"\t\t\t\tvalues: new {{ newDTOItem.{uriValue} }}");
             sb.AppendLine("\t\t\t\t);");
             sb.AppendLine(string.Empty);
 
@@ -384,13 +402,14 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         private string GeneratePut(IEntityType entity, string namespacePostfix, string entityName)
         {
-            var methodSignature = GetSignatureWithoutFieldTypes("", entity.FindPrimaryKey(), lowercasePkNameFirstChar: true);
-            var methodSignatureWithType = GetSignatureWithFieldTypes("", entity.FindPrimaryKey());
-            var pascalizedMethodSignature = Inflector.Pascalize(methodSignature);
+            var routeSignature = GetMethodParametersWithoutTypes(entity, "}/{");
+            var methodSignature = GetMethodParametersWithoutTypes(entity);
+            var methodSignatureWithType = GetMethodParameterSignature(entity);
+            var primaryKeys = GetPrimaryKeys(entity);
 
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine($"[HttpPut(\"{{{methodSignature}}}\")]");
+            sb.AppendLine($"[HttpPut(\"{{{routeSignature}}}\")]");
             sb.AppendLine($"[VersionedActionConstraint(allowedVersion: 1, order: 100)]");
             sb.AppendLine($"public async Task<IActionResult> Put({methodSignatureWithType}, [FromBody] dto{namespacePostfix}.{entityName} dtoItem)");
             sb.AppendLine("{");
@@ -406,7 +425,13 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\t\t\treturn BadRequest();");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine($"\t\tdtoItem.{pascalizedMethodSignature} = {methodSignature}; // Ensure that we update the record with a matching Primary Key.");
+            sb.AppendLine("\t\t// ensure we update the record matching the parameter");
+            foreach(var pk in primaryKeys)
+            {
+                var ppk = Inflector.Pascalize(pk);
+                var cpk = Inflector.Camelize(pk);
+                sb.AppendLine($"\t\tdtoItem.{ppk} = {cpk};");
+            }
             sb.AppendLine(string.Empty);
 
             sb.AppendLine("\t\tvar updatedDBItem = _factory.Create(dtoItem); // Map the incoming DTO to a DB entity.");

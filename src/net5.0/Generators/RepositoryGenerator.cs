@@ -42,31 +42,8 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 string whereClause = WhereClause(objectInstancePrefix: null, indent: "", entity.Properties, entity.FindPrimaryKey(), useLowerForFirstCharOfPropertyName: true);
                 string whereClauseWithObjectInstancePrefix = WhereClause(objectInstancePrefix: "item", indent: "", entity.Properties, entity.FindPrimaryKey(), useLowerForFirstCharOfPropertyName: false);
 
-                var primaryKeyNames = GetPrimaryKeys(entity); // TODO: Move this into the BaseBlazorGenerator so we can use this everywhere.
-                var properties = entity.GetProperties();
-
-                StringBuilder signatureSB = new StringBuilder();
-                var pkCount = primaryKeyNames.Count();
-                foreach (var primaryKey in primaryKeyNames)
-                {
-                    var property = properties.Where(x => x.Name == primaryKey).FirstOrDefault();
-                    if (property == null)
-                    {
-                        continue;
-                    }
-                    var cType = GetCType(property);
-                    var simpleType = ConvertToSimpleType(cType);
-                    var camelPK = Inflector.Camelize(primaryKey);
-                    signatureSB.Append($"{simpleType} {camelPK}");
-                    pkCount--;
-                    if (pkCount > 0)
-                    {
-                        signatureSB.Append(", ");
-                    }
-                }
-
-                string methodParameterSignature = signatureSB.ToString();
-                string methodParameterSignatureWithoutFieldTypes = GetSignatureWithoutFieldTypes(string.Empty, entity.FindPrimaryKey(), lowercasePkNameFirstChar: true);
+                string methodParameterSignature = GetMethodParameterSignature(entity);
+                string methodParameterSignatureWithoutFieldTypes = GetMethodParametersWithoutTypes(entity);
 
                 sb.AppendLine($"\t#region {entityName}");
                 sb.AppendLine(string.Empty);
@@ -74,7 +51,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 sb.Append(GenerateInsertOperation(entityName));
                 sb.Append(GenerateGetQueryable(entityName));
                 sb.Append(GenerateGetPageData(entityName));
-                sb.Append(GenerateGetFirstOrDefault(entityName, tableNamePlural, methodParameterSignature, primaryKeyNames, whereClause, whereClauseWithObjectInstancePrefix));
+                sb.Append(GenerateGetFirstOrDefault(entityName, tableNamePlural, methodParameterSignature, methodParameterSignatureWithoutFieldTypes, whereClause, whereClauseWithObjectInstancePrefix));
                 sb.Append(GenerateUpdateOperation(entityName, tableNamePlural, whereClauseWithObjectInstancePrefix));
                 sb.Append(GenerateDeleteOperations(entityName, tableNamePlural, whereClause, whereClauseWithObjectInstancePrefix, methodParameterSignature));
                 sb.Append(GeneratePartialMethodSignatures(entityName, methodParameterSignature));
@@ -289,12 +266,12 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         private string GenerateGetFirstOrDefault(string tableName, string tableNamePlural,
             string methodParameterSignature,
-            List<string> primaryKeys,
+            string methodParameterSignatureWithoutFieldTypes,
             string whereClause, string whereClauseWithObjectInstancePrefix)
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.Append(GenerateGetFirstOrDefaultByPrimaryKey(tableName, methodParameterSignature, primaryKeys, whereClause));
+            sb.Append(GenerateGetFirstOrDefaultByPrimaryKey(tableName, methodParameterSignature, methodParameterSignatureWithoutFieldTypes, whereClause));
             sb.Append(GenerateGetFirstOrDefaultByObject(tableName, tableNamePlural, whereClauseWithObjectInstancePrefix));
 
             return sb.ToString();
@@ -386,22 +363,8 @@ namespace CodeGenHero.Template.Blazor5.Generators
             return sb.ToString();
         }
 
-        private string GenerateGetFirstOrDefaultByPrimaryKey(string tableName, string methodParameterSignature, List<string> primaryKeys, string whereClause)
+        private string GenerateGetFirstOrDefaultByPrimaryKey(string tableName, string methodParameterSignature, string methodParameterSignatureWithoutFieldTypes, string whereClause)
         {
-            StringBuilder pksb = new StringBuilder();
-            var pkCount = primaryKeys.Count();
-            foreach(var pk in primaryKeys)
-            {
-                var cpk = Inflector.Camelize(pk);
-                pksb.Append(cpk);
-                pkCount--;
-                if (pkCount > 0)
-                {
-                    pksb.Append(", ");
-                }
-            }
-            var methodParameterSignatureWithoutFieldTypes = pksb.ToString();
-
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
             sb.AppendLine($"public async Task<{tableName}> Get_{tableName}Async({methodParameterSignature}, Enums.RelatedEntitiesType relatedEntitiesType)");
