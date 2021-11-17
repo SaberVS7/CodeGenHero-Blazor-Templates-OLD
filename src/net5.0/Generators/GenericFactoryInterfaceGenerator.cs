@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CodeGenHero.Template.Blazor5.Generators
 {
-    internal class GenericFactoryInterfaceGenerator : BaseBlazorGenerator
+    public class GenericFactoryInterfaceGenerator : BaseBlazorGenerator
     {
         public GenericFactoryInterfaceGenerator(ICodeGenHeroInflector inflector) : base(inflector)
         {

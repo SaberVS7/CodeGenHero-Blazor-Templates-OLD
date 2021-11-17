@@ -8,7 +8,7 @@ namespace CodeGenHero.Template.Blazor5
         protected string TokenReplacements(string tokenString, IEntityType entity)
         {
             string retVal = tokenString
-                .Replace("[tablename]", Inflector.Humanize(entity.ClrType.Name))
+                .Replace("[tablename]", Inflector.Pascalize(entity.ClrType.Name))
                 .Replace("[tablepluralname]", Inflector.Pluralize(entity.ClrType.Name));
 
             return retVal;

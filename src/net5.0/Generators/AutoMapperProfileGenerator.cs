@@ -8,7 +8,7 @@ using System.Text;
 
 namespace CodeGenHero.Template.Blazor5.Generators
 {
-    internal class AutoMapperProfileGenerator : BaseBlazorGenerator
+    public class AutoMapperProfileGenerator : BaseBlazorGenerator
     {
         private const string EXCLUDEPERNAVIGATIONPROPERTYCONFIGURATION = " -- Excluded navigation property per configuration.";
 

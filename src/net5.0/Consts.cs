@@ -63,6 +63,9 @@
         public const string PTG_RepositoryNamespace_DEFAULT = "{BaseNamespace}.Repository.Repositories.{NamespacePostFix}";
         public const string PTG_RepositoryNamespace_DESC = "The namespace of the Repository classes this template will use. Should be promoted to Global.";
 
+        public const string PTG_WebApiDataServiceNamespace_DEFAULT = "{BaseNamespace}.App.Services";
+        public const string PTG_WebApiDataServiceNamespace_DESC = "The namespace of the Web API Data Service classes this template will use. Should be promoted to Global.";
+
         #endregion Namespaces
 
         #region Class Names
@@ -73,7 +76,7 @@
         public const string PTG_AutoMapperName_DESC = "The name of the AutoMapper Profile class. Should be promoted to Global.";
         public const string PTG_BaseAPIControllerName_DEFAULT = "{namespacePostfix}BaseApiController";
         public const string PTG_BaseAPIControllerName_DESC = "The name of the Base API Controller class. Should be promoted to Global.";
-        public const string PTG_DbContextName_DEFAULT = "{NamespacePostFix}DataContext";
+        public const string PTG_DbContextName_DEFAULT = "{namespacePostfix}DataContext";
         public const string PTG_DbContextName_DESC = "The name of the DbContext class this Repository is expected to access. Should be promoted to Global.";
 
         public const string PTG_GenericFactoryInterfaceName_DEFAULT = "I{namespacePostfix}GenericFactory";
@@ -89,23 +92,54 @@
         public const string PTG_RepositoryName_DEFAULT = "{namespacePostfix}Repository";
         public const string PTG_RepositoryName_DESC = "The name of the Repository class. Should be promoted to Global.";
 
+        public const string PTG_WebApiDataServiceInterfaceName_DEFAULT = "IWebApiDataService{namespacePostfix}";
+        public const string PTG_WebApiDataServiceInterfaceName_DESC = "The name of the Web API Data Service interface. Should be promoted to Global.";
+
+        public const string PTG_WebApiDataServiceClassName_DEFAULT = "WebApiDataService{namespacePostfix}";
+        public const string PTG_WebApiDataServiceClassName_DESC = "The name of the Web API Data Service class. Should be promoted to Global.";
+
+        public const string PTG_ApiStatusControllerClassName_DEFAULT = "{namespacePostfix}ApiStatusController";
+        public const string PTG_ApiStatusControllerClassName_DESC = "The name of the API Status Controller class. Should be promoted to Global.";
+
+        public const string PTG_AdminListPageViewModelClassName_DEFAULT = "{namespacePostfix}[tablename]ListViewModel";
+        public const string PTG_AdminListPageViewModelClassName_DESC = "The name of the Admin List Page Viewmodel class. Should be promoted to Global";
+
         #endregion Class Names
 
-        // API Controller
+        #region Output Filepaths
+        /// Output Filepath Defaults
         public const string APIControllerFilePath_DEFAULTVALUE = "Blazor\\Controllers\\[tablename]Controller.cs";
 
-        // AutoMapper
         public const string AutoMapperProfileOutputFilepath_DEFAULT = "Blazor\\Repository\\{NamespacePostfix}AutoMapperProfile.cs";
 
-        // Base API Controller
         public const string BaseAPIControllerOutputFilepath_DEFAULT = "Blazor\\API\\{NamespacePostfix}BaseApiController.cs";
 
-        // Generic Factory Interface
         public const string GenericFactoryInterfaceOutputFilepath_DEFAULT = "Blazor\\Repository\\I{NamespacePostfix}GenericFactory.cs";
 
-        // Generic Factory
         public const string GenericFactoryOutputFilepath_DEFAULT = "Blazor\\Repository\\{NamespacePostfix}GenericFactory.cs";
 
+        public const string RepositoryCrudInterfaceOutputFilepath_DEFAULT = "Blazor\\Repository\\I{NamespacePostfix}RepositoryCrud.cs";
+
+        public const string RepositoryInterfaceOutputFilepath_DEFAULT = "Blazor\\Repository\\I{NamespacePostfix}Repository.cs";
+
+        public const string RepositoryOutputFilepath_DEFAULT = "Blazor\\Repository\\{NamespacePostfix}Repository.cs";
+
+        public const string DTOFilePath_DEFAULTVALUE = "Blazor\\DTO\\{NamespacePostfix}\\[tablename].cs";
+
+        public const string WebApiDataServiceInterfaceOutputFilepath_DEFAULT = "Blazor\\Services\\IWebApiDataService{NamespacePostfix}.cs";
+
+        public const string WebApiDataServiceOutputFilepath_DEFAULT = "Blazor\\Services\\WebApiDataService{NamespacePostfix}.cs";
+
+        public const string ApiStatusControllerOutputFilepath_DEFAULT = "Blazor\\API\\{NamespacePostfix}ApiStatusController.cs";
+
+        public const string AdminListPageOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]List.razor";
+
+        public const string AdminListPageViewModelOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]List.razor.cs";
+
+        #endregion
+
+        #region Output Variable Names
+        /// Output Filepath Variable Names
         public const string OUT_APIControllerFilePath_DEFAULTVALUE = "APIControllerOutputFilepath";
 
         public const string OUT_AutoMapperProfileOutputFilepath_DEFAULT = "AutoMapperProfileOutputFilepath";
@@ -122,13 +156,23 @@
 
         public const string OUT_RepositoryOutputFilepath_DEFAULT = "RepositoryOutputFilepath";
 
-        // CRUD Interface
-        public const string RepositoryCrudInterfaceOutputFilepath_DEFAULT = "Blazor\\Repository\\I{NamespacePostfix}RepositoryCrud.cs";
+        public const string OUT_DTOFilePath_DEFAULTVALUE = "DTOOutputFilepath";
 
-        // Repository Interface
-        public const string RepositoryInterfaceOutputFilepath_DEFAULT = "Blazor\\Repository\\I{NamespacePostfix}Repository.cs";
+        public const string OUT_WebApiDataServiceInterfaceOuputFilepath_DEFAULT = "WebApiDataServiceInterfaceOuputFilepath";
 
-        // Repository
-        public const string RepositoryOutputFilepath_DEFAULT = "Blazor\\Repository\\{NamespacePostfix}Repository.cs";
+        public const string OUT_WebApiDataServiceOutputFilepath_DEFAULT = "WebApiDataServiceOutputFilepath";
+
+        public const string OUT_ApiStatusControllerOutputFilepath_DEFAULT = "ApiStatusControllerOutputFilepath";
+
+        public const string OUT_AdminListPageOutputFilepath_DEFAULT = "AdminListPageOutputFilepath";
+
+        public const string OUT_AdminListPageViewModelOutputFilepath_DEFAULT = "AdminListPageViewModelOutputFilepath";
+
+        #endregion
+
+        /// Class-specific variables
+        // Web API Data Service
+        public const string WebApiDataServiceApiRelativeURL_DEFAULT = "api/{namespacePostfix}";
+        public const string WebApiDataServiceApiRelativeURL_DESC = "Relative URL of the API's route";
     }
 }

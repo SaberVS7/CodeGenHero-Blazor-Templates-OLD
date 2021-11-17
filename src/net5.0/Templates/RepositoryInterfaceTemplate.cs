@@ -8,7 +8,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
 {
     [Template(name: "RepositoryInterface", version: "2021.9.14", uniqueTemplateIdGuid: "FF160397-8584-4518-8EC7-A9549B37515A",
         description: "Generates the Interface for a Repository Class to implement.")]
-    internal class RepositoryInterfaceTemplate : BaseBlazorTemplate
+    public class RepositoryInterfaceTemplate : BaseBlazorTemplate
     {
         public RepositoryInterfaceTemplate()
         {
@@ -48,12 +48,13 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
                 var usings = new List<NamespaceItem>
                 {
-                    new NamespaceItem("CodeGenHero.Repository"),
                     new NamespaceItem(EntitiesNamespace),
+                    new NamespaceItem($"{BaseNamespace}.Repository.Infrastructure"),
                     new NamespaceItem("System"),
+                    new NamespaceItem("System.Collections.Generic"),
                     new NamespaceItem("System.Threading.Tasks"),
                     new NamespaceItem($"ent{NamespacePostfix} = {EntitiesNamespace}"),
-                    new NamespaceItem("waEnums = MSC.WhittierArtists.Shared.Constants.Enums")
+                    new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums")
                 };
 
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);

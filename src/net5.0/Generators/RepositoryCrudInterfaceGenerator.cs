@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CodeGenHero.Template.Blazor5.Generators
 {
-    internal class RepositoryCrudInterfaceGenerator : BaseBlazorGenerator
+    public class RepositoryCrudInterfaceGenerator : BaseBlazorGenerator
     {
         public RepositoryCrudInterfaceGenerator(ICodeGenHeroInflector inflector) : base(inflector)
         {
@@ -41,7 +41,8 @@ namespace CodeGenHero.Template.Blazor5.Generators
             foreach (var entity in entities)
             {
                 var entityName = entity.ClrType.Name;
-                sb.AppendLine($"\t\tIQueryable<{entityName}> GetQueryable_{entityName}();");
+                sb.AppendLine($"\t\tIQueryable<{entityName}> GetQueryable_{entityName}(");
+                sb.AppendLine($"\t\t\tEnums.RelatedEntitiesType relatedEntitiesType = Enums.RelatedEntitiesType.None");
             }
 
             sb.Append(GenerateFooter());
