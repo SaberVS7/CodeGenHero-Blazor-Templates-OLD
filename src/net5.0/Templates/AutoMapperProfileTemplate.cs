@@ -16,6 +16,12 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
         #region TemplateVariables
 
+        [TemplateVariable(defaultValue: "", description: "Regex Pattern to exclude Entity Navigations based off of.")]
+        public string ExcludedNavigationRegex { get; set; }
+
+        [TemplateVariable(defaultValue: "", description: "Regex Pattern to include Entity Navigations based off of.")]
+        public string IncludedNavigationRegex { get; set; }
+
         [TemplateVariable(defaultValue: Consts.PTG_AutoMapperName_DEFAULT, description: Consts.PTG_AutoMapperName_DESC)]
         public string AutoMapperProfileClassName { get; set; }
 
@@ -51,7 +57,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
                 };
 
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
-                var excludedEntityNavigations = ProcessModel.GetAllExcludedEntityNavigations(RegexExclude, RegexInclude);
+                var excludedEntityNavigations = ProcessModel.GetAllExcludedEntityNavigations(ExcludedNavigationRegex, IncludedNavigationRegex);
 
                 var generator = new AutoMapperProfileGenerator(inflector: Inflector);
                 var generatedCode = generator.Generate(usings, MappersNamespace, NamespacePostfix, entities, excludedEntityNavigations, AutoMapperProfileClassName);

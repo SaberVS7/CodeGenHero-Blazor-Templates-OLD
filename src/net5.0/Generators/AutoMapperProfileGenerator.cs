@@ -76,7 +76,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
                         var navigationName = navigation.Name;
                         string commentOut = EntityNavigationsContainsNavigationName(excludedEntityNavigations, entity, navigationName) ? "//" : string.Empty;
 
-                        sb.AppendLine($"\t\t{commentOut}.ForMember(d => d.{navigationName}, opt => opt.Ignore())");
+                        sb.AppendLine($"\t\t{commentOut}.ForMember(x => x.{navigationName}, opt => opt.Ignore())");
                         if (!string.IsNullOrEmpty(commentOut))
                         {
                             sb.Append(EXCLUDEPERNAVIGATIONPROPERTYCONFIGURATION);
