@@ -56,7 +56,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     new NamespaceItem("Microsoft.Extensions.Logging"),
                     new NamespaceItem($"{BaseNamespace}.Shared.DataService"),
                     new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums"),
-                    new NamespaceItem("xDTO = {DtoNamespace}")
+                    new NamespaceItem($"xDTO = {DtoNamespace}")
                 };
 
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
