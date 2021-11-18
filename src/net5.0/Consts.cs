@@ -66,6 +66,9 @@
         public const string PTG_WebApiDataServiceNamespace_DEFAULT = "{BaseNamespace}.App.Services";
         public const string PTG_WebApiDataServiceNamespace_DESC = "The namespace of the Web API Data Service classes this template will use. Should be promoted to Global.";
 
+        public const string PTG_AppPageViewModelsNamespace_DEFAULT = "{BaseNamespace}.App.Pages";
+        public const string PTG_AppPageViewModelsNamespace_DESC = "The namespace of Razor Page viewmodels this template will use. Should be promoted to Global";
+
         #endregion Namespaces
 
         #region Class Names
@@ -101,7 +104,7 @@
         public const string PTG_ApiStatusControllerClassName_DEFAULT = "{namespacePostfix}ApiStatusController";
         public const string PTG_ApiStatusControllerClassName_DESC = "The name of the API Status Controller class. Should be promoted to Global.";
 
-        public const string PTG_AdminListPageViewModelClassName_DEFAULT = "{namespacePostfix}[tablename]ListViewModel";
+        public const string PTG_AdminListPageViewModelClassName_DEFAULT = "{namespacePostfix}[tablepluralname]ListViewModel";
         public const string PTG_AdminListPageViewModelClassName_DESC = "The name of the Admin List Page Viewmodel class. Should be promoted to Global";
 
         #endregion Class Names
@@ -134,7 +137,7 @@
 
         public const string AdminListPageOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]List.razor";
 
-        public const string AdminListPageViewModelOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]List.razor.cs";
+        public const string AdminListPageViewModelOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablepluralname]List.razor.cs";
 
         #endregion
 

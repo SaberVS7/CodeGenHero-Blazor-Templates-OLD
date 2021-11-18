@@ -23,6 +23,9 @@ namespace CodeGenHero.Template.Blazor5.Templates
         [TemplateVariable(defaultValue: Consts.PTG_WebApiDataServiceClassName_DEFAULT, description: Consts.PTG_WebApiDataServiceClassName_DESC)]
         public string WebApiDataServiceClassName { get; set; }
 
+        [TemplateVariable(defaultValue: Consts.PTG_AppPageViewModelsNamespace_DEFAULT, description: Consts.PTG_AppPageViewModelsNamespace_DESC)]
+        public string AppPageViewModelsNamespace { get; set; }
+
         [TemplateVariable(defaultValue: Consts.PTG_DtoNamespace_DEFAULT, description: Consts.PTG_DtoNamespace_DESC)]
         public string DtoNamespace { get; set; }
 
@@ -53,7 +56,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     new NamespaceItem("System.Collections.Generic"),
                     new NamespaceItem("System.Linq"),
                     new NamespaceItem("System.Threading.Tasks"),
-                    new NamespaceItem("Enums = MSC.WhittierArtists.Shared.Constants.Enums")
+                    new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums")
                 };
 
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
@@ -66,7 +69,8 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
                     string className = TokenReplacements(AdminListPageViewModelClassName, entity);
 
-                    var generatedCode = string.Empty;
+                    var generator = new AdminListPageViewModelGenerator(inflector: Inflector);
+                    var generatedCode = generator.Generate(usings, AppPageViewModelsNamespace, NamespacePostfix, entity, className, WebApiDataServiceClassName);
 
                     retVal.Files.Add(new OutputFile()
                     {
