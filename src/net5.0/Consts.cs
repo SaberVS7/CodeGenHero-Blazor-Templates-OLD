@@ -135,7 +135,7 @@
 
         public const string ApiStatusControllerOutputFilepath_DEFAULT = "Blazor\\API\\{NamespacePostfix}ApiStatusController.cs";
 
-        public const string AdminListPageOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]List.razor";
+        public const string AdminListPageOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablepluralname]List.razor";
 
         public const string AdminListPageViewModelOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablepluralname]List.razor.cs";
 
