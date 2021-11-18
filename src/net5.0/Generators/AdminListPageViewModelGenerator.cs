@@ -24,9 +24,9 @@ namespace CodeGenHero.Template.Blazor5.Generators
         {
             var entityName = $"{entity.ClrType.Name}";
             var pluralizedEntityName = Inflector.Pluralize(entityName);
-            var pk = entity.FindPrimaryKey();
-            var methodSignature = GetSignatureWithFieldTypes(string.Empty, pk);
-            var methodSignatureUntyped = GetSignatureWithoutFieldTypes(string.Empty, pk, lowercasePkNameFirstChar: true);
+            var methodSignature = GetMethodParameterSignature(entity);
+            var methodSignatureUntyped = GetMethodParametersWithoutTypes(entity);
+            var primaryKeys = GetPrimaryKeys(entity);
 
             StringBuilder sb = new StringBuilder();
 
@@ -41,7 +41,10 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine(string.Empty);
 
             sb.Append(GenerateProperties(entityName, pluralizedEntityName));
-            sb.Append(GenerateDeleteMethods(entityName, methodSignature, methodSignatureUntyped, webApiDataServiceClassName));
+            sb.Append(GenerateDeleteMethods(entityName, methodSignature, methodSignatureUntyped, webApiDataServiceClassName, primaryKeys));
+            sb.Append(GenerateFilterFunction(entityName, primaryKeys));
+            sb.Append(GenerateOnInitializedAsync(pluralizedEntityName));
+            sb.Append(GenerateCommonMethods(pluralizedEntityName));
 
             sb.Append(GenerateFooter());
 
@@ -78,20 +81,33 @@ namespace CodeGenHero.Template.Blazor5.Generators
             return sb.ToString();
         }
 
-        private string GenerateDeleteMethods(string entityName, string methodSignature, string methodSignatureUntyped, string webApiDataServiceClassName)
+        private string GenerateDeleteMethods(string entityName, string methodSignature, string methodSignatureUntyped, string webApiDataServiceClassName, List<string> primaryKeys)
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(GenerateConfirmDelete(entityName, methodSignatureUntyped));
-            sb.AppendLine(GenerateDeleteEntity(entityName, methodSignature, methodSignatureUntyped, webApiDataServiceClassName));
+            sb.Append(GenerateConfirmDelete(entityName, primaryKeys));
+            sb.Append(GenerateDeleteEntity(entityName, methodSignature, methodSignatureUntyped, webApiDataServiceClassName));
 
             return sb.ToString();
         }
 
         #region Delete Method Generators
 
-        private string GenerateConfirmDelete(string entityName, string methodSignatureUntyped)
+        private string GenerateConfirmDelete(string entityName, List<string> primaryKeys)
         {
+            StringBuilder deleteSignatureSB = new StringBuilder();
+            var pkCount = primaryKeys.Count();
+            foreach (var pk in primaryKeys)
+            {
+                deleteSignatureSB.Append($"item.{pk}");
+                pkCount--;
+                if (pkCount > 0)
+                {
+                    deleteSignatureSB.Append(", ");
+                }
+            }
+            var deleteSignature = deleteSignatureSB.ToString();
+
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
             sb.AppendLine($"protected async Task ConfirmDeleteAsync({entityName} item)");
@@ -107,8 +123,10 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\tif (!result.Cancelled)");
             sb.AppendLine("\t{");
 
+            sb.AppendLine($"\t\tawait Delete{entityName}Async({deleteSignature});");
+
             sb.AppendLine("\t}");
-            sb.AppendLine($"\t\tawait Delete{entityName}Async(item.{methodSignatureUntyped});");
+            
             sb.AppendLine("}");
             sb.AppendLine(string.Empty);
 
@@ -117,13 +135,13 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         private string GenerateDeleteEntity(string entityName, string methodSignature, string methodSignatureUntyped, string webApiDataServiceClassName)
         {
-            string successCodeLiteral = 
-                    @"StatusClass = ""alert-success"";
+            string successCodeLiteral = @"
+                    StatusClass = ""alert-success"";
                     Message = ""Deleted successfully"";
                     await SetSavedAsync(true);";
 
-            string failCodeLiteral =
-                    @"StatusClass = ""alert-danger"";
+            string failCodeLiteral = @"
+                    StatusClass = ""alert-danger"";
                     Message = ""Something went wrong deleting the item. Please try again."";
                     await SetSavedAsync(false);";
 
@@ -134,13 +152,13 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             sb.AppendLine($"\tvar result = await {webApiDataServiceClassName}.Delete{entityName}Async({methodSignatureUntyped});");
             sb.AppendLine($"\tif (result.IsSuccessStatusCode)");    // Remember to include a Commented Out reference to the WebApiDataService in the MPT's Component-Base for the end-dev to hand-populate.
-            sb.AppendLine("\t{");
+            sb.Append("\t{");
 
             sb.AppendLine(successCodeLiteral);
 
             sb.AppendLine("\t}");
             sb.AppendLine("\telse");
-            sb.AppendLine("\t{");
+            sb.Append("\t{");
 
             sb.AppendLine(failCodeLiteral);
 
@@ -153,5 +171,106 @@ namespace CodeGenHero.Template.Blazor5.Generators
         }
 
         #endregion
+
+        private string GenerateFilterFunction(string entityName, List<string> primaryKeys)
+        {
+            IndentingStringBuilder sb = new IndentingStringBuilder(2);
+
+            sb.AppendLine($"protected bool Filter{entityName}1({entityName} item) => FilterFunc(item, SearchString1);");
+            sb.AppendLine(string.Empty);
+
+            sb.AppendLine($"protected bool FilterFunc({entityName} item, string searchString)");
+            sb.AppendLine("{");
+
+            sb.AppendLine("\tif (string.IsNullOrWhiteSpace(searchString))");
+            sb.AppendLine("\t\treturn true;");
+            sb.AppendLine(string.Empty);
+
+            sb.AppendLine("\tsearchString = searchString.Trim();");
+            foreach(var pk in primaryKeys)
+            {
+                sb.AppendLine($"\tif (!string.IsNullOrWhiteSpace(item.{pk}) && item.{pk}.Contains(searchString, StringComparison.OrdinalIgnoreCase))");
+                sb.AppendLine("\t\treturn true;");
+                sb.AppendLine(string.Empty);
+            }
+
+            sb.AppendLine("\treturn false;");
+
+            sb.AppendLine("}");
+            sb.AppendLine(string.Empty);
+
+            return sb.ToString();
+        }
+
+        private string GenerateOnInitializedAsync(string pluralizedEntityName)
+        {
+            string lowerEntityPlural = Inflector.ToLowerFirstCharacter(pluralizedEntityName);
+
+            IndentingStringBuilder sb = new IndentingStringBuilder(2);
+
+            sb.AppendLine("protected override async Task OnInitializedAsync()");
+            sb.AppendLine("{");
+
+            sb.AppendLine("\tawait base.OnInitializedAsync();");
+            sb.AppendLine("\tIsReady = false;");
+            sb.AppendLine("\tawait SetSavedAsync(false);");
+            sb.AppendLine(string.Empty);
+
+            sb.AppendLine("\ttry");
+            sb.AppendLine("\t{");
+
+            sb.AppendLine("\t\tList<BreadcrumbItem> breadcrumbs = new List<BreadcrumbItem>()");
+            sb.AppendLine("\t\t{");
+
+            sb.AppendLine("\t\t\tnew BreadcrumbItem(\"Home\", \"/\"),");
+            sb.AppendLine($"\t\t\tnew BreadcrumbItem(\"List of {pluralizedEntityName}\", \"/admin/{lowerEntityPlural}\", disabled: true)");
+
+            sb.AppendLine("\t\t};");
+            sb.AppendLine(string.Empty);
+
+            sb.AppendLine("\t\tNavigationService.SetBreadcrumbs(breadcrumbs);");
+
+            sb.AppendLine("\t}");
+            sb.AppendLine("\tfinally");
+            sb.AppendLine("\t{");
+
+            sb.AppendLine("\t\tIsReady = true;");
+
+            sb.AppendLine("\t}");
+
+            sb.AppendLine("}");
+            sb.AppendLine(string.Empty);
+
+            return sb.ToString();
+        }
+
+        private string GenerateCommonMethods(string pluralizedEntityName)
+        {
+            var lowerPlural = Inflector.ToLowerFirstCharacter(pluralizedEntityName);
+
+            var setSavedLiteral = @"
+        protected async Task SetSavedAsync(bool value)
+        {
+            Saved = value;
+            if (value == true)
+            {
+                await JsRuntime.InvokeVoidAsync(""blazorExtensions.ScrollToTop"");
+            }
+        }";
+
+            IndentingStringBuilder sb = new IndentingStringBuilder(2);
+
+            sb.AppendLine("protected void ReturnToList()");
+            sb.AppendLine("{");
+
+            sb.AppendLine($"\tNavigationManager.NavigateTo(\"/admin/{lowerPlural}\");");
+
+            sb.AppendLine("}");
+
+            sb.AppendLine(setSavedLiteral);
+            sb.AppendLine(string.Empty);
+
+            return sb.ToString();
+        }
     }
 }

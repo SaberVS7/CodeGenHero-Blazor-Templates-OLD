@@ -29,7 +29,6 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             sb.Append(GenerateConstructor(className, repositoryInterfaceClassName));
             sb.Append(GenerateGet());
-            sb.Append(string.Empty);
 
             sb.Append(GenerateFooter());
             return sb.ToString();
@@ -43,7 +42,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\tIServiceProvider serviceProvider,");
             sb.AppendLine("\tIHttpContextAccessor httpContextAccessor,");
             sb.AppendLine("\tLinkGenerator linkGenerator,");
-            sb.AppendLine($"\t{repositoryInterfaceName} repository");
+            sb.AppendLine($"\t{repositoryInterfaceName} repository)");
             sb.AppendLine("\t: base(logger, serviceProvider, httpContextAccessor, linkGenerator, repository)");
             sb.AppendLine("{");
             sb.AppendLine("}");
@@ -54,7 +53,10 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
         private string GenerateGet()
         {
-            string retVal = @"[HttpGet]
+            IndentingStringBuilder sb = new IndentingStringBuilder(2);
+
+            string getLiteral = 
+            @"[HttpGet]
 		    [VersionedActionConstraint(allowedVersion: 1, order: 100)]
 		    public async Task<IActionResult> Get()
 		    {
@@ -73,7 +75,10 @@ namespace CodeGenHero.Template.Blazor5.Generators
 			    }
 		    }";
 
-            return retVal;
+            sb.AppendLine(getLiteral);
+            sb.AppendLine(string.Empty);
+
+            return sb.ToString();
         }
     }
 }
