@@ -33,7 +33,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.Append(GenerateHeader(usings, classNamespace));
 
             sb.AppendLine("\t[Authorize(Roles = Consts.ROLE_ADMIN_OR_USER)]");
-            sb.AppendLine($"\tpublic class {className} : AdminPageBase");
+            sb.AppendLine($"\tpublic partial class {className} : AdminPageBase");
             sb.AppendLine("\t{");
             sb.AppendLine($"\t\tpublic {className}()");
             sb.AppendLine("\t\t{");
