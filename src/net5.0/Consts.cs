@@ -107,6 +107,9 @@
         public const string PTG_AdminListPageViewModelClassName_DEFAULT = "{namespacePostfix}[tablepluralname]ListViewModel";
         public const string PTG_AdminListPageViewModelClassName_DESC = "The name of the Admin List Page Viewmodel class. Should be promoted to Global";
 
+        public const string PTG_AdminEditViewModelClassName_DEFAULT = "{namespacePostfix}[tablename]EditViewModel";
+        public const string PTG_AdminEditViewModelClassName_DESC = "The name of the Admin Edit Page Viewmodel class. Should be promoted to Global";
+
         #endregion Class Names
 
         #region Output Filepaths
@@ -139,6 +142,8 @@
 
         public const string AdminListPageViewModelOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablepluralname]List.razor.cs";
 
+        public const string AdminEditViewModelOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]Edit.razor.cs";
+
         #endregion
 
         #region Output Variable Names
@@ -170,6 +175,8 @@
         public const string OUT_AdminListPageOutputFilepath_DEFAULT = "AdminListPageOutputFilepath";
 
         public const string OUT_AdminListPageViewModelOutputFilepath_DEFAULT = "AdminListPageViewModelOutputFilepath";
+
+        public const string OUT_AdminEditViewModelOutputFilepath_DEFAULT = "AdminEditViewModelOutputFilepath";
 
         #endregion
 
