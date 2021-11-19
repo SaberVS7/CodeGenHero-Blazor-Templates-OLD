@@ -24,8 +24,9 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.Append(GenerateIfIsReady());
             sb.Append(GenerateIfNotSaved(entity));
             sb.Append(GenerateIfSaved());
+            sb.Append(GenerateIfMessageExists());
 
-            sb.AppendLine("</div>");
+            sb.AppendLine("\n</div>");
 
             return sb.ToString();
         }
@@ -98,7 +99,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 sb.AppendLine($"\t\t\t<MudTd DataLabel=\"{pk}\">@context.{pk}</MudTd>");
             }
             sb.AppendLine("\t\t\t<MudTd DataLabel=\"Is Active\">@context.IsActive</MudTd>");
-            sb.AppendLine("\t\t\t<MudTd DataLabel=\"\">");
+            sb.AppendLine("\t\t\t<MudTd DataLabel=\"Actions\">");
             sb.AppendLine("\t\t\t\t<MudButton @onclick=\"@(()=>ConfirmDeleteAsync(context))\" Variant=\"Variant.Filled\" Color=\"Color.Error\" Style=\"height: 38px; min-width: 44px;\">");
             sb.AppendLine("\t\t\t\t\t<i class=\"fas fa-trash-alt\"></i>");
             sb.AppendLine("\t\t\t\t</MudButton>");
@@ -110,7 +111,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\t\t</PagerContent>");
             sb.AppendLine("\t</MudTable>");
 
-            sb.AppendLine("}");
+            sb.Append("}");
 
             return sb.ToString();
         }
@@ -128,6 +129,22 @@ namespace CodeGenHero.Template.Blazor5.Generators
     }";
 
             return ifSavedLiteral;
+        }
+
+        private string GenerateIfMessageExists()
+        {
+            var ifMessageExistsLiteral = @"
+    @if (!string.IsNullOrWhiteSpace(Message))
+    {
+        <div class=""alert @StatusClass"">
+            @Message
+                <MudButton @onclick=""@ClearMessage"" Variant=""Variant.Filled"" Color=""Color.Error"" Style=""height: 12px; width: 12px; min-width: 12px; padding: 1px; top: -6px;"">
+                    <i class=""fas fa-times""></i>
+                </MudButton>
+        </div>
+    }";
+
+            return ifMessageExistsLiteral;
         }
     }
 }

@@ -37,6 +37,17 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     string outputFile = TemplateVariablesManager.GetOutputFile(templateIdentity: ProcessModel.TemplateIdentity,
                     fileName: Consts.OUT_AdminListPageOutputFilepath_DEFAULT);
                     string filepath = TokenReplacements(outputFile, entity);
+
+                    var viewModelClassName = TokenReplacements(AdminListPageViewModelClassName, entity);
+
+                    var generator = new AdminListPageGenerator(inflector: Inflector);
+                    var generatedCode = generator.Generate(entity, viewModelClassName);
+
+                    retVal.Files.Add(new OutputFile()
+                    {
+                        Content = generatedCode,
+                        Name = filepath
+                    });
                 }
             }
             catch (Exception ex)
