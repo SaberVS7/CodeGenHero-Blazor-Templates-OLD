@@ -16,6 +16,12 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
         #region TemplateVariables
 
+        [TemplateVariable(defaultValue: Consts.PTG_AdminListPageViewModelClassName_DEFAULT, description: Consts.PTG_AdminListPageViewModelClassName_DESC)]
+        public string AdminListPageViewModelClassName { get; set; }
+
+        [TemplateVariable(defaultValue: Consts.AdminListPageOutputFilepath_DEFAULT)]
+        public string AdminListPageOutputFilepath { get; set; }
+
         #endregion
 
         public override TemplateOutput Generate()
@@ -24,7 +30,25 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
             try
             {
+                var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
 
+                foreach (var entity in entities)
+                {
+                    string outputFile = TemplateVariablesManager.GetOutputFile(templateIdentity: ProcessModel.TemplateIdentity,
+                    fileName: Consts.OUT_AdminListPageOutputFilepath_DEFAULT);
+                    string filepath = TokenReplacements(outputFile, entity);
+
+                    var viewModelClassName = TokenReplacements(AdminListPageViewModelClassName, entity);
+
+                    var generator = new AdminListPageGenerator(inflector: Inflector);
+                    var generatedCode = generator.Generate(entity, viewModelClassName);
+
+                    retVal.Files.Add(new OutputFile()
+                    {
+                        Content = generatedCode,
+                        Name = filepath
+                    });
+                }
             }
             catch (Exception ex)
             {
