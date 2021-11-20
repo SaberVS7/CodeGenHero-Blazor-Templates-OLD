@@ -22,9 +22,9 @@ namespace CodeGenHero.ProjectTemplate.Blazor5.Wizard
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string DEFAULT_APP_CONNECTIONSTRING = @"Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=MyApp;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        private const string DEFAULT_APP_CONNECTIONSTRING = @"Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=ArtistSite;Integrated Security=True;";
 
-        private const string DEFAULT_IDP_CONNECTIONSTRING = @"Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=MyIDP;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        private const string DEFAULT_IDP_CONNECTIONSTRING = @"Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=MyIDP;Integrated Security=True;";
 
         private const string DEFAULT_ADMIN_USERNAME = "myAdmin";
 
