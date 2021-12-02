@@ -81,7 +81,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     new NamespaceItem("System.Collections.Generic"),
                     new NamespaceItem("System.Linq"),
                     new NamespaceItem("System.Threading.Tasks"),
-                    new NamespaceItem($"static {BaseNamespace}.Repository.Infrastucture.Enums"),
+                    new NamespaceItem($"static {BaseNamespace}.Repository.Infrastructure.Enums"),
                     new NamespaceItem($"dto{NamespacePostfix} = {DtoNamespace}"),
                     new NamespaceItem($"ent{NamespacePostfix} = {EntitiesNamespace}"),
                     new NamespaceItem($"Enums = {BaseNamespace}.Shared.Constants.Enums")

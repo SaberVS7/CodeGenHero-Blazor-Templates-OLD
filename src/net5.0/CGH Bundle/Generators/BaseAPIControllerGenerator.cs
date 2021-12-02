@@ -55,7 +55,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine("public WABaseApiController()");
+            sb.AppendLine($"public {className}()");
             sb.AppendLine("{");
             sb.AppendLine("\t_logger = NullLogger.Instance;");
             sb.AppendLine("}");
@@ -150,7 +150,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
                         HttpContext.Request.GetEncodedUrl() };
                     Log.LogError(eventId: (int)Enums.EventId.Exception_WebApi,
                         exception: ex,
-                        message: $""{ex.Message} {httpResponseStatusCode}:{url}"",
+                        message: $""{ex.Message} {{httpResponseStatusCode}}:{{url}}"",
                         args: args);
 
                     var retVal = StatusCode(StatusCodes.Status500InternalServerError,

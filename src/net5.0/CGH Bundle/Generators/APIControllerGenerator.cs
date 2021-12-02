@@ -145,7 +145,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             sb.AppendLine($"[HttpGet(template: \"ById/{{{routeSignature}}}/{{relatedEntitiesType:relatedEntitiesType=None}}\")]");
             sb.AppendLine("[VersionedActionConstraint(allowedVersion: 1, order: 100)]");
-            sb.AppendLine($"public async Task<IActionResult> Get({methodSignatureWithType}, waEnums.RelatedEntitiesType relatedEntitiesType)");
+            sb.AppendLine($"public async Task<IActionResult> Get({methodSignatureWithType}, Enums.RelatedEntitiesType relatedEntitiesType)");
             sb.AppendLine("{");
 
             sb.AppendLine("\ttry");
@@ -378,7 +378,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\t\t\t\thttpContext: HttpContextAccessor.HttpContext,");
             sb.AppendLine("\t\t\t\taction: nameof(Get),");
             sb.AppendLine("\t\t\t\tcontroller: null, // Stay in this controller");
-            sb.AppendLine($"\t\t\t\tvalues: new {{ newDTOItem.{uriValue} }}");
+            sb.AppendLine($"\t\t\t\tvalues: new {{ {uriValue} }}");
             sb.AppendLine("\t\t\t\t);");
             sb.AppendLine(string.Empty);
 

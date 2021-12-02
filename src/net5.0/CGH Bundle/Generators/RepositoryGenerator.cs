@@ -431,10 +431,10 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine($"partial void RunCustomLogicAfterUpdate_{tableName}({tableName} newItem, {tableName} oldItem, IRepositoryActionResult<{tableName}> result);");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine($"partial void RunCustomLogicOnGetQueryableByPK_{tableName}(ref IQueryable<{tableName}> qryItem, {methodParameterSignature}, waEnums.RelatedEntitiesType relatedEntitiesType);");
+            sb.AppendLine($"partial void RunCustomLogicOnGetQueryableByPK_{tableName}(ref IQueryable<{tableName}> qryItem, {methodParameterSignature}, Enums.RelatedEntitiesType relatedEntitiesType);");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine($"partial void RunCustomLogicOnGetEntityByPK_{tableName}(ref {tableName} dbItem, {methodParameterSignature}, waEnums.RelatedEntitiesType relatedEntitiesType);");
+            sb.AppendLine($"partial void RunCustomLogicOnGetEntityByPK_{tableName}(ref {tableName} dbItem, {methodParameterSignature}, Enums.RelatedEntitiesType relatedEntitiesType);");
             sb.AppendLine(string.Empty);
 
             sb.AppendLine("partial void ApplyRelatedEntitiesType(");

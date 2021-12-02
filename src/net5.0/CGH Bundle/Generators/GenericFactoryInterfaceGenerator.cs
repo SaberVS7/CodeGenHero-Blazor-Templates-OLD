@@ -29,10 +29,10 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("\tTDto Create(TEntity item);");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine("\tobject CreateDataShapedObject(object item, List<string> fieldList, bool childrenRequested);");
+            sb.AppendLine("\tobject CreateDataShapedObject(object item, List<string> fieldList);");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine("\tobject CreateDataShapedObject(TEntity item, List<string> lstOfFields, bool childrenRequested);");
+            sb.AppendLine("\tobject CreateDataShapedObject(TEntity item, List<string> lstOfFields);");
             sb.AppendLine(string.Empty);
 
             sb.Append(GenerateFooter());
