@@ -34,6 +34,9 @@ namespace CodeGenHero.Template.Blazor5.Templates
         [TemplateVariable(defaultValue: Consts.WebApiDataServiceApiRelativeURL_DEFAULT, description: Consts.WebApiDataServiceApiRelativeURL_DESC)]
         public string ApiRelativeURL { get; set; }
 
+        [TemplateVariable(defaultValue: "", description: Consts.WebApiDataServiceCheckForIsActiveRegex)]
+        public string CheckForIsActiveRegex { get; set; }
+
         #endregion
 
         public override TemplateOutput Generate()
@@ -60,9 +63,10 @@ namespace CodeGenHero.Template.Blazor5.Templates
                 };
 
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
+                var entitiesToCheckIsActive = ProcessModel.MetadataSourceModel.GetEntityTypesMatchingRegEx(CheckForIsActiveRegex);
 
                 var generator = new WebApiDataServiceGenerator(inflector: Inflector);
-                string generatedCode = generator.Generate(usings, WebApiDataServiceNamespace, NamespacePostfix, entities, WebApiDataServiceClassName, WebApiDataServiceInterfaceClassName, ApiRelativeURL);
+                string generatedCode = generator.Generate(usings, WebApiDataServiceNamespace, NamespacePostfix, entities, WebApiDataServiceClassName, WebApiDataServiceInterfaceClassName, ApiRelativeURL, entitiesToCheckIsActive);
 
                 retVal.Files.Add(new OutputFile()
                 {

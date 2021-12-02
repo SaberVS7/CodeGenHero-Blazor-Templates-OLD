@@ -2,8 +2,10 @@
 using CodeGenHero.Inflector;
 using CodeGenHero.Template.Helpers;
 using CodeGenHero.Template.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace CodeGenHero.Template.Blazor5.Generators
 {
@@ -20,7 +22,8 @@ namespace CodeGenHero.Template.Blazor5.Generators
             IList<IEntityType> entities,
             string className,
             string interfaceName,
-            string apiUrl)
+            string apiUrl,
+            IList<IEntityType> entitiesToCheckIsActive)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -31,8 +34,8 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine(string.Empty);
 
             sb.Append(GenerateConstructor(className, apiUrl, namespacePostfix));
-            sb.Append(GenerateGetAllPages(entities));
-            sb.Append(GenerateGetOnePage(entities, apiUrl));
+            sb.Append(GenerateGetAllPages(entities, entitiesToCheckIsActive));
+            sb.Append(GenerateGetOnePage(entities, apiUrl, entitiesToCheckIsActive));
             sb.Append(GenerateGetByPK(entities, apiUrl));
             sb.Append(GenerateCreate(entities, apiUrl));
             sb.Append(GenerateUpdate(entities, apiUrl));
@@ -58,113 +61,159 @@ namespace CodeGenHero.Template.Blazor5.Generators
             return sb.ToString();
         }
 
-        private string GenerateGetAllPages(IList<IEntityType> entities)
+        private string GenerateGetAllPages(IList<IEntityType> entities, IList<IEntityType> entitiesToCheckForIsActive)
         {
-            string signatureThirdLine = "\tEnums.RelatedEntitiesType relatedEntitiesType)";
-            IndentingStringBuilder sb = new IndentingStringBuilder(2);
+            StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("#region GetAllPages");
+            sb.AppendLine("\t\t#region GetAllPages");
             sb.AppendLine(string.Empty);
 
             foreach (var entity in entities)
             {
-                string entityName = entity.ClrType.Name;
-                string pluralEntityName = Inflector.Pluralize(entityName);
+                try
+                {
+                    string entityName = entity.ClrType.Name;
+                    string pluralEntityName = Inflector.Pluralize(entityName);
 
-                // Start of first method overload
-                sb.AppendLine($"public async Task<IList<xDTO.{entityName}>> GetAllPages{pluralEntityName}Async(");
-                sb.AppendLine("\tbool? isActive, string sort,");
-                sb.AppendLine(signatureThirdLine);
-                sb.AppendLine("{");
+                    bool checkActive = entitiesToCheckForIsActive.Where(x => x.ClrType.Name == entityName).Any();
 
-                sb.AppendLine("\tList<IFilterCriterion> filterCriteria = new List<IFilterCriterion>();");
-                sb.AppendLine(string.Empty);
+                    sb.Append(GenerateGetAllPagesByActive(entityName, pluralEntityName, checkActive));
+                    sb.Append(GenerateGetAllPagesFiltered(entityName, pluralEntityName));
+                }
+                catch (Exception ex)
+                {
+                    sb.AppendLine(ex.Message);
+                }
+            }
 
+            sb.AppendLine("\t\t#endregion");
+            sb.AppendLine(string.Empty);
+
+            return sb.ToString();
+        }
+
+        private string GenerateGetAllPagesByActive(string entityName, string pluralEntityName, bool checkActive)
+        {
+            IndentingStringBuilder sb = new IndentingStringBuilder(2);
+
+            sb.AppendLine($"public async Task<IList<xDTO.{entityName}>> GetAllPages{pluralEntityName}Async(");
+            sb.AppendLine("\tbool? isActive, string sort,");
+            sb.AppendLine("\tEnums.RelatedEntitiesType relatedEntitiesType)");
+            sb.AppendLine("{");
+
+            sb.AppendLine("\tList<IFilterCriterion> filterCriteria = new List<IFilterCriterion>();");
+            sb.AppendLine(string.Empty);
+
+            if (checkActive)
+            {
                 sb.AppendLine("\tif (isActive.HasValue)");
                 sb.AppendLine("\t{");
 
                 sb.AppendLine("\t\tIFilterCriterion filterCriterion = new FilterCriterion(");
                 sb.AppendLine($"\t\t\tfieldName: nameof(xDTO.{entityName}.IsActive),");
                 sb.AppendLine("\t\t\tcondition: Enums.CriterionCondition.IsEqualTo,");
-                sb.AppendLine("\t\t\tvalue: isActive");
+                sb.AppendLine("\t\t\tvalue: isActive);");
                 sb.AppendLine(string.Empty);
 
                 sb.AppendLine("\t\tfilterCriteria.Add(filterCriterion);");
-
                 sb.AppendLine("\t}");
-
-                sb.AppendLine($"\tvar retVal = await GetAllPages{pluralEntityName}Async(filterCriteria, sort, relatedEntitiesType);");
-                sb.AppendLine("\treturn retVal;");
-
-                sb.AppendLine("}");
                 sb.AppendLine(string.Empty);
-                // End of first method overload
-
-                // Start of second method overload
-                sb.AppendLine($"public async Task<IList<xDTO.{entityName}>> GetAllPages{pluralEntityName}Async(");
-                sb.AppendLine("\tList<IFilterCriterion> filterCriteria, string sort,");
-                sb.AppendLine(signatureThirdLine);
-                sb.AppendLine("{");
-
-                sb.AppendLine("\tIPageDataRequest pageDataRequest = new PageDataRequest(filterCriteria: filterCriteria, sort: sort, page: 1, pageSize: 100, relatedEntitiesType: relatedEntitiesType);");
-                sb.AppendLine(string.Empty);
-                
-                sb.AppendLine($"\tvar retVal = await GetAllPageDataResultsAsync(pageDataRequest, Get{pluralEntityName}Async);");
-                sb.AppendLine("\treturn retVal;");
-
-                sb.AppendLine("}");
-                sb.AppendLine(string.Empty);
-                // End of second method overload
             }
 
-            sb.AppendLine("#endregion");
+            sb.AppendLine($"\tvar retVal = await GetAllPages{pluralEntityName}Async(filterCriteria, sort, relatedEntitiesType);");
+            sb.AppendLine("\treturn retVal;");
+
+            sb.AppendLine("}");
             sb.AppendLine(string.Empty);
 
             return sb.ToString();
         }
 
-        private string GenerateGetOnePage(IList<IEntityType> entities, string apiUrl)
+        private string GenerateGetAllPagesFiltered(string entityName, string pluralEntityName)
         {
-            string signatureThirdLine = "\tEnums.RelatedEntitiesType relatedEntitiesType)";
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine("#region GetOnePage");
+            sb.AppendLine($"public async Task<IList<xDTO.{entityName}>> GetAllPages{pluralEntityName}Async(");
+            sb.AppendLine("\tList<IFilterCriterion> filterCriteria, string sort,");
+            sb.AppendLine("\tEnums.RelatedEntitiesType relatedEntitiesType)");
+            sb.AppendLine("{");
+
+            sb.AppendLine("\tIPageDataRequest pageDataRequest = new PageDataRequest(filterCriteria: filterCriteria, sort: sort, page: 1, pageSize: 100, relatedEntitiesType: relatedEntitiesType);");
+            sb.AppendLine(string.Empty);
+
+            sb.AppendLine($"\tvar retVal = await GetAllPageDataResultsAsync(pageDataRequest, Get{pluralEntityName}Async);");
+            sb.AppendLine("\treturn retVal;");
+
+            sb.AppendLine("}");
+            sb.AppendLine(string.Empty);
+
+            return sb.ToString();
+        }
+
+        private string GenerateGetOnePage(IList<IEntityType> entities, string apiUrl, IList<IEntityType> entitiesToCheckForIsActive)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("\t\t#region GetOnePage");
             sb.AppendLine(string.Empty);
 
             foreach (var entity in entities)
             {
                 string entityName = entity.ClrType.Name;
                 string pluralEntityName = Inflector.Pluralize(entityName);
-                string signatureFirstLine = $"public async Task<IHttpCallResultCGHT<IPageDataT<IList<xDTO.{entityName}>>>> Get{pluralEntityName}Async(";
+                bool checkActive = entitiesToCheckForIsActive.Where(x => x.ClrType.Name == entityName).Any();
 
-                // First Method Overload
-                sb.AppendLine($"{signatureFirstLine}IPageDataRequest pageDataRequest)");
-                sb.AppendLine("{");
+                sb.Append(GenerateGetOnePageByPageDataRequest(entityName, pluralEntityName, apiUrl));
+                sb.Append(GenerateGetOnePageWithActiveCheck(entityName, pluralEntityName, checkActive));
+                sb.Append(GenerateGetOnePageWithFilter(entityName, pluralEntityName));
+            }
 
-                sb.AppendLine("\tList<string> filter = BuildFilter(pageDataRequest.FilterCriteria);");
-                sb.AppendLine(string.Empty);
+            sb.AppendLine("\t\t#endregion");
+            sb.AppendLine(string.Empty);
 
-                sb.AppendLine($"\tstring requestUrl = $\"{apiUrl}/{entityName}/{{(int)pageDataRequest.RelatedEntitiesType}}/\";");
-                sb.AppendLine($"\tvar retVal = await SerializationHelper.SerializeCallResultsGet<IList<xDTO.{entityName}>>(");
-                sb.AppendLine("\t\tLog, HttpClient, requestUrl,");
-                sb.AppendLine("\t\tfilter: filter,");
-                sb.AppendLine("\t\tsort: pageDataRequest.Sort,");
-                sb.AppendLine("\t\tpage: pageDataRequest.Page,");
-                sb.AppendLine("\t\tpageSize: pageDataRequest.PageSize);");
-                sb.AppendLine(string.Empty);
+            return sb.ToString();
+        }
 
-                sb.AppendLine("\treturn retVal;");
+        private string GenerateGetOnePageByPageDataRequest(string entityName, string pluralEntityName, string apiUrl)
+        {
+            IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-                sb.AppendLine("}");
-                sb.AppendLine(string.Empty);
+            sb.AppendLine($"public async Task<IHttpCallResultCGHT<IPageDataT<IList<xDTO.{entityName}>>>> Get{pluralEntityName}Async(IPageDataRequest pageDataRequest)");
+            sb.AppendLine("{");
 
-                // Second Method Overload
-                sb.AppendLine(signatureFirstLine);
-                sb.AppendLine("\tbool? isActive, string sort, int page, int pageSize,");
-                sb.AppendLine(signatureThirdLine);
-                sb.AppendLine("{");
+            sb.AppendLine("\tList<string> filter = BuildFilter(pageDataRequest.FilterCriteria);");
+            sb.AppendLine(string.Empty);
 
-                sb.AppendLine("\tList<IFilterCriterion> filterCriteria = new List<IFilterCriterion>();");
+            sb.AppendLine($"\tstring requestUrl = $\"{apiUrl}/{entityName}/{{(int)pageDataRequest.RelatedEntitiesType}}/\";");
+            sb.AppendLine($"\tvar retVal = await SerializationHelper.SerializeCallResultsGet<IList<xDTO.{entityName}>>(");
+            sb.AppendLine("\t\tLog, HttpClient, requestUrl,");
+            sb.AppendLine("\t\tfilter: filter,");
+            sb.AppendLine("\t\tsort: pageDataRequest.Sort,");
+            sb.AppendLine("\t\tpage: pageDataRequest.Page,");
+            sb.AppendLine("\t\tpageSize: pageDataRequest.PageSize);");
+            sb.AppendLine(string.Empty);
+
+            sb.AppendLine("\treturn retVal;");
+
+            sb.AppendLine("}");
+            sb.AppendLine(string.Empty);
+
+            return sb.ToString();
+        }
+
+        private string GenerateGetOnePageWithActiveCheck(string entityName, string pluralEntityName, bool checkActive)
+        {
+            IndentingStringBuilder sb = new IndentingStringBuilder(2);
+
+            sb.AppendLine($"public async Task<IHttpCallResultCGHT<IPageDataT<IList<xDTO.{entityName}>>>> Get{pluralEntityName}Async(");
+            sb.AppendLine("\tbool? isActive, string sort, int page, int pageSize,");
+            sb.AppendLine("\tEnums.RelatedEntitiesType relatedEntitiesType)");
+            sb.AppendLine("{");
+
+            sb.AppendLine("\tList<IFilterCriterion> filterCriteria = new List<IFilterCriterion>();");
+
+            if (checkActive)
+            {
                 sb.AppendLine("\tif (isActive.HasValue)");
                 sb.AppendLine("\t{");
 
@@ -175,33 +224,34 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 sb.AppendLine("\t\tfilterCriteria.Add(filterCriterion);");
 
                 sb.AppendLine("\t}");
-                sb.AppendLine(string.Empty);
-
-                sb.AppendLine($"\tvar retVal = await Get{pluralEntityName}Async(filterCriteria, sort, page, pageSize, relatedEntitiesType);");
-                sb.AppendLine("\treturn retVal;");
-
-                sb.AppendLine("}");
-                sb.AppendLine(string.Empty);
-
-                // Third Method Overload
-                sb.AppendLine(signatureFirstLine);
-                sb.AppendLine($"\tList<IFilterCriterion> filterCriteria, string sort, int page, int pageSize,");
-                sb.AppendLine(signatureThirdLine);
-                sb.AppendLine("{");
-
-                sb.AppendLine("\tIPageDataRequest pageDataRequest = new PageDataRequest(filterCriteria: filterCriteria, sort: sort, page: page, pageSize: pageSize, relatedEntitiesType: relatedEntitiesType);");
-                sb.AppendLine(string.Empty);
-
-                sb.AppendLine($"\tvar retVal = await Get{pluralEntityName}Async(pageDataRequest);");
-                sb.AppendLine("\treturn retVal;");
-
-                sb.AppendLine("}");
-                sb.AppendLine(string.Empty);
-
-                
             }
+            sb.AppendLine(string.Empty);
 
-            sb.AppendLine("#endregion");
+            sb.AppendLine($"\tvar retVal = await Get{pluralEntityName}Async(filterCriteria, sort, page, pageSize, relatedEntitiesType);");
+            sb.AppendLine("\treturn retVal;");
+
+            sb.AppendLine("}");
+            sb.AppendLine(string.Empty);
+
+            return sb.ToString();
+        }
+
+        private string GenerateGetOnePageWithFilter(string entityName, string pluralEntityName)
+        {
+            IndentingStringBuilder sb = new IndentingStringBuilder(2);
+
+            sb.AppendLine($"public async Task<IHttpCallResultCGHT<IPageDataT<IList<xDTO.{entityName}>>>> Get{pluralEntityName}Async(");
+            sb.AppendLine($"\tList<IFilterCriterion> filterCriteria, string sort, int page, int pageSize,");
+            sb.AppendLine("\tEnums.RelatedEntitiesType relatedEntitiesType)");
+            sb.AppendLine("{");
+
+            sb.AppendLine("\tIPageDataRequest pageDataRequest = new PageDataRequest(filterCriteria: filterCriteria, sort: sort, page: page, pageSize: pageSize, relatedEntitiesType: relatedEntitiesType);");
+            sb.AppendLine(string.Empty);
+
+            sb.AppendLine($"\tvar retVal = await Get{pluralEntityName}Async(pageDataRequest);");
+            sb.AppendLine("\treturn retVal;");
+
+            sb.AppendLine("}");
             sb.AppendLine(string.Empty);
 
             return sb.ToString();
@@ -249,7 +299,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             {
                 string entityName = entity.ClrType.Name;
 
-                sb.AppendLine($"public async Task<IHttpCallResultCGHT<xDTO.{entityName}>> Create{entityName}Async(xDTO.{entityName} item);");
+                sb.AppendLine($"public async Task<IHttpCallResultCGHT<xDTO.{entityName}>> Create{entityName}Async(xDTO.{entityName} item)");
                 sb.AppendLine("{");
 
                 sb.AppendLine($"\tvar retVal = await SerializationHelper.SerializeCallResultsPost<xDTO.{entityName}>(");
@@ -312,7 +362,8 @@ namespace CodeGenHero.Template.Blazor5.Generators
             foreach (var entity in entities)
             {
                 string entityName = entity.ClrType.Name;
-                string signature = GetSignatureWithFieldTypes(string.Empty, entity.FindPrimaryKey());
+                string signature = GetMethodParameterSignature(entity);
+                string apiSignature = GetMethodParametersWithoutTypes(entity, "}/{");
                 var primaryKeys = GetPrimaryKeys(entity);
 
                 sb.AppendLine($"public async Task<IHttpCallResultCGHT<xDTO.{entityName}>> Delete{entityName}Async({signature})");
@@ -320,13 +371,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
                 sb.AppendLine($"\tvar retVal = await SerializationHelper.SerializeCallResultsDelete<xDTO.{entityName}>(");
                 sb.AppendLine("\t\tLog, HttpClient,");
-                sb.Append($"\t\t\t\t$\"{apiUrl}/{entityName}");
-                foreach(var key in primaryKeys)
-                {
-                    var camelKey = Inflector.Camelize(key);
-                    sb.Append($"/{{{camelKey}}}");
-                }
-                sb.AppendLine("\");");
+                sb.AppendLine($"\t\t\t\t$\"{apiUrl}/{entityName}/{{{apiSignature}}}\");");
                 sb.AppendLine(string.Empty);
 
                 sb.AppendLine("\treturn retVal;");

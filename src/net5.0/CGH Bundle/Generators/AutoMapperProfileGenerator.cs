@@ -21,6 +21,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             string classNamespace,
             string namespacePostfix,
             IList<IEntityType> entities,
+            bool includeEntityNavigations,
             IList<IEntityNavigation> excludedEntityNavigations,
             string className)
         {
@@ -31,7 +32,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             sb.AppendLine("{");
 
             sb.Append(GenerateConstructor(className));
-            sb.Append(GenerateInitializers(entities, excludedEntityNavigations));
+            sb.Append(GenerateInitializers(entities, includeEntityNavigations, excludedEntityNavigations));
 
             sb.Append(GenerateFooter());
             return sb.ToString();
@@ -52,7 +53,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
             return sb.ToString();
         }
 
-        private string GenerateInitializers(IList<IEntityType> entities, IList<IEntityNavigation> excludedEntityNavigations)
+        private string GenerateInitializers(IList<IEntityType> entities, bool includeEntityNavigations, IList<IEntityNavigation> excludedEntityNavigations)
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
@@ -83,15 +84,18 @@ namespace CodeGenHero.Template.Blazor5.Generators
                         }
                     }
 
-                    foreach (var foreignKey in entity.ForeignKeys)
+                    if (includeEntityNavigations)
                     {
-                        string fkName = Inflector.Pascalize(foreignKey.DependentToPrincipal.ClrType.Name);
-                        string commentOut = EntityNavigationsContainsNavigationName(excludedEntityNavigations, entity, fkName) ? "//" : string.Empty;
-
-                        sb.AppendLine($"\t\t{commentOut}.ForMember(d => d.{fkName}, opt => opt.Ignore())");
-                        if (!string.IsNullOrEmpty(commentOut))
+                        foreach (var foreignKey in entity.ForeignKeys)
                         {
-                            sb.Append(EXCLUDEPERNAVIGATIONPROPERTYCONFIGURATION);
+                            string fkName = Inflector.Pascalize(foreignKey.DependentToPrincipal.ClrType.Name);
+                            string commentOut = EntityNavigationsContainsNavigationName(excludedEntityNavigations, entity, fkName) ? "//" : string.Empty;
+
+                            sb.AppendLine($"\t\t{commentOut}.ForMember(d => d.{fkName}, opt => opt.Ignore())");
+                            if (!string.IsNullOrEmpty(commentOut))
+                            {
+                                sb.Append(EXCLUDEPERNAVIGATIONPROPERTYCONFIGURATION);
+                            }
                         }
                     }
                 }

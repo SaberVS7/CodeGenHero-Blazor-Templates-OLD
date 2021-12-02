@@ -16,6 +16,9 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
         #region TemplateVariables
 
+        [TemplateVariable(defaultValue: "false", description: "Whether or not the template should generate entity foreign-key navigations")]
+        public bool IncludeEntityNavigations { get; set; }
+
         [TemplateVariable(defaultValue: "", description: "Regex Pattern to exclude Entity Navigations based off of.")]
         public string ExcludedNavigationRegex { get; set; }
 
@@ -60,7 +63,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
                 var excludedEntityNavigations = ProcessModel.GetAllExcludedEntityNavigations(ExcludedNavigationRegex, IncludedNavigationRegex);
 
                 var generator = new AutoMapperProfileGenerator(inflector: Inflector);
-                var generatedCode = generator.Generate(usings, MappersNamespace, NamespacePostfix, entities, excludedEntityNavigations, AutoMapperProfileClassName);
+                var generatedCode = generator.Generate(usings, MappersNamespace, NamespacePostfix, entities, IncludeEntityNavigations, excludedEntityNavigations, AutoMapperProfileClassName);
 
                 retVal.Files.Add(new OutputFile()
                 {

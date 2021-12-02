@@ -2,7 +2,7 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
         <Identity Id="CodeGenHero.ProjectTemplate.Blazor5.ab591ef2-9c2e-4336-8d1f-fb5c502bd8be" Version="1.0" Language="en-US" Publisher="MSCTek" />
-        <DisplayName>CodeGenHero Blazor5 ProjectTemplate</DisplayName>
+        <DisplayName>CGH Blazor5</DisplayName>
         <Description xml:space="preserve">Blazor multi-project template for use with CodeGenHero.</Description>
     </Metadata>
     <Installation>

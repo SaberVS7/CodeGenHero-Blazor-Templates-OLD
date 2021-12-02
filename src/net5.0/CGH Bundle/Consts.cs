@@ -184,5 +184,6 @@
         // Web API Data Service
         public const string WebApiDataServiceApiRelativeURL_DEFAULT = "api/{namespacePostfix}";
         public const string WebApiDataServiceApiRelativeURL_DESC = "Relative URL of the API's route";
+        public const string WebApiDataServiceCheckForIsActiveRegex = "Regular Expression to determine which Entities should have an \"IsActive\" check in their Get Methods. Only include entities that have a boolean property of this name.";
     }
 }
