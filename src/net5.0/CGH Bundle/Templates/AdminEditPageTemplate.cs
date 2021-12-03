@@ -6,30 +6,27 @@ using System.Collections.Generic;
 
 namespace CodeGenHero.Template.Blazor5.Templates
 {
-    [Template(name: "AdminEditViewModel", version: "2021.11.12", uniqueTemplateIdGuid: "17AE856A-A589-40C0-A5BE-1579B0714385",
-        description: "Generates a View Model for code-backing of a Razor page that allows an Admin to edit an Entity.")]
-    public class AdminEditViewModelTemplate : BaseBlazorTemplate
+    [Template(name: "AdminEditPage", version: "2021.12.3", uniqueTemplateIdGuid: "BF6A5C3B-7D19-4F08-83E6-C341BC350F81",
+        description: "Generates a basic Razor page visible to Admin users that allows them to edit metadata entity.")]
+    public class AdminEditPageTemplate : BaseBlazorTemplate
     {
-        public AdminEditViewModelTemplate()
+        public AdminEditPageTemplate()
         {
         }
 
         #region TemplateVariables
 
-        [TemplateVariable(defaultValue: Consts.PTG_WebApiDataServiceClassName_DEFAULT, description: Consts.PTG_WebApiDataServiceClassName_DESC)]
-        public string WebApiDataServiceClassName { get; set; }
-
         [TemplateVariable(defaultValue: Consts.PTG_AdminEditViewModelClassName_DEFAULT, description: Consts.PTG_AdminEditViewModelClassName_DESC)]
         public string AdminEditViewModelClassName { get; set; }
 
-        [TemplateVariable(defaultValue: Consts.PTG_AppPageViewModelsNamespace_DEFAULT, description: Consts.PTG_AppPageViewModelsNamespace_DESC)]
-        public string AppPageViewModelsNamespace { get; set; }
+        [TemplateVariable(defaultValue: Consts.PTG_WebApiDataServiceNamespace_DEFAULT, description: Consts.PTG_WebApiDataServiceNamespace_DESC)]
+        public string WebApiDataServiceNamespace { get; set; }
 
         [TemplateVariable(defaultValue: Consts.PTG_DtoNamespace_DEFAULT, description: Consts.PTG_DtoNamespace_DESC)]
         public string DtoNamespace { get; set; }
 
-        [TemplateVariable(defaultValue: Consts.AdminEditViewModelOutputFilepath_DEFAULT, hiddenIndicator: true)]
-        public string AdminEditViewModelOutputFilepath { get; set; }
+        [TemplateVariable(defaultValue: Consts.AdminEditPageOutputFilepath_DEFAULT, hiddenIndicator: true)]
+        public string AdminEditPageOutputFilepath { get; set; }
 
         #endregion
 
@@ -45,7 +42,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
                     new NamespaceItem("Microsoft.AspNetCore.Components"),
                     new NamespaceItem("Microsoft.AspNetCore.Components.Forms"),
                     new NamespaceItem("Microsoft.JSInterop"),
-                    new NamespaceItem($"{BaseNamespace}.App.Services"),
+                    new NamespaceItem($"{WebApiDataServiceNamespace}"),
                     new NamespaceItem($"{BaseNamespace}.App.Shared"),
                     new NamespaceItem($"{BaseNamespace}.Shared.Constants"),
                     new NamespaceItem($"{DtoNamespace}"),
@@ -63,13 +60,11 @@ namespace CodeGenHero.Template.Blazor5.Templates
                 foreach (var entity in entities)
                 {
                     string outputFile = TemplateVariablesManager.GetOutputFile(templateIdentity: ProcessModel.TemplateIdentity,
-                    fileName: Consts.OUT_AdminEditViewModelOutputFilepath_DEFAULT);
+                        fileName: Consts.OUT_AdminEditPageOutputFilepath_DEFAULT);
                     string filepath = TokenReplacements(outputFile, entity);
 
-                    string className = TokenReplacements(AdminEditViewModelClassName, entity);
-
-                    var generator = new AdminEditViewModelGenerator(inflector: Inflector);
-                    var generatedCode = generator.Generate(usings, AppPageViewModelsNamespace, NamespacePostfix, entity, className, WebApiDataServiceClassName);
+                    var generator = new AdminEditPageGenerator(inflector: Inflector);
+                    var generatedCode = generator.Generate(entity, AdminEditViewModelClassName);
 
                     retVal.Files.Add(new OutputFile()
                     {

@@ -144,6 +144,8 @@
 
         public const string AdminEditViewModelOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]Edit.razor.cs";
 
+        public const string AdminEditPageOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]Edit.razor";
+
         #endregion
 
         #region Output Variable Names
@@ -177,6 +179,8 @@
         public const string OUT_AdminListPageViewModelOutputFilepath_DEFAULT = "AdminListPageViewModelOutputFilepath";
 
         public const string OUT_AdminEditViewModelOutputFilepath_DEFAULT = "AdminEditViewModelOutputFilepath";
+
+        public const string OUT_AdminEditPageOutputFilepath_DEFAULT = "AdminEditPageOutputFilepath";
 
         #endregion
 

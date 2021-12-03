@@ -35,7 +35,7 @@ namespace CodeGenHero.Template.Blazor5.Templates
                 foreach (var entity in entities)
                 {
                     string outputFile = TemplateVariablesManager.GetOutputFile(templateIdentity: ProcessModel.TemplateIdentity,
-                    fileName: Consts.OUT_AdminListPageOutputFilepath_DEFAULT);
+                        fileName: Consts.OUT_AdminListPageOutputFilepath_DEFAULT);
                     string filepath = TokenReplacements(outputFile, entity);
 
                     var viewModelClassName = TokenReplacements(AdminListPageViewModelClassName, entity);
