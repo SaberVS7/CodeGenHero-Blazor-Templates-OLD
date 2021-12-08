@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Height="360" d:DesignWidth="500">
+    Height="370" d:DesignWidth="500">
     <DockPanel Height="Auto" Width="Auto" LastChildFill="True">
         <TextBlock DockPanel.Dock="Top" Height="23" Margin="10,10,0,0"
                    Text="Enter a connection string to an EXISTING application database:"/>
