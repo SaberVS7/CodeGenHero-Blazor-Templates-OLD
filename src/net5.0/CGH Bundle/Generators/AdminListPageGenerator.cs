@@ -38,7 +38,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine($"@page \"/admin/{Inflector.ToLowerFirstCharacter(entityNamePlural)}\"");
+            sb.AppendLine($"@page \"/admin/{entityNamePlural.ToLower()}\"");
             sb.AppendLine($"@inherits {adminListPageViewModelClassName}");
             sb.AppendLine("<div class=\"mud-palette-override\"> @* This outer div is necessary CSS Isolation to function *@\n");
 

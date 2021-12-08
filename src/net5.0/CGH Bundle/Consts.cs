@@ -51,16 +51,16 @@
 
         #region Namespaces
 
-        public const string PTG_APIControllerNamespace_DEFAULT = "{BaseNamespace}.Api.Controllers.{NamespacePostFix}";
+        public const string PTG_APIControllerNamespace_DEFAULT = "{BaseNamespace}.Api.Controllers";
         public const string PTG_APIControllerNamespace_DESC = "The namespace of the API Controller classes this template will use. Should be promoted to Global.";
-        public const string PTG_DtoNamespace_DEFAULT = "{BaseNamespace}.DTO.{NamespacePostFix}";
+        public const string PTG_DtoNamespace_DEFAULT = "{BaseNamespace}.Shared.DTO";
         public const string PTG_DtoNamespace_DESC = "The namespace of the DTO classes this template will use. Should be promoted to Global.";
-        public const string PTG_EntitiesNamespace_DEFAULT = "{BaseNamespace}.Entities.{NamespacePostFix}";
+        public const string PTG_EntitiesNamespace_DEFAULT = "{BaseNamespace}.Entities";
         public const string PTG_EntitiesNamespace_DESC = "The namespace of the Db Entities that this Repository will use. Should be promoted to Global.";
 
-        public const string PTG_MappersNamespace_DEFAULT = "{BaseNamespace}.Repository.Mappers.{NamespacePostFix}";
+        public const string PTG_MappersNamespace_DEFAULT = "{BaseNamespace}.Repository.Mappers";
         public const string PTG_MappersNamespace_DESC = "The namespace of Entity to DTO Mapper classes. Should be promoted to Global.";
-        public const string PTG_RepositoryNamespace_DEFAULT = "{BaseNamespace}.Repository.Repositories.{NamespacePostFix}";
+        public const string PTG_RepositoryNamespace_DEFAULT = "{BaseNamespace}.Repository.Repositories";
         public const string PTG_RepositoryNamespace_DESC = "The namespace of the Repository classes this template will use. Should be promoted to Global.";
 
         public const string PTG_WebApiDataServiceNamespace_DEFAULT = "{BaseNamespace}.App.Services";
@@ -130,7 +130,7 @@
 
         public const string RepositoryOutputFilepath_DEFAULT = "Blazor\\Repository\\{NamespacePostfix}Repository.cs";
 
-        public const string DTOFilePath_DEFAULTVALUE = "Blazor\\DTO\\{NamespacePostfix}\\[tablename].cs";
+        public const string DTOFilePath_DEFAULTVALUE = "Blazor\\DTO\\{NamespacePostfix}[tablename].cs";
 
         public const string WebApiDataServiceInterfaceOutputFilepath_DEFAULT = "Blazor\\Services\\IWebApiDataService{NamespacePostfix}.cs";
 
@@ -143,6 +143,8 @@
         public const string AdminListPageViewModelOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablepluralname]List.razor.cs";
 
         public const string AdminEditViewModelOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]Edit.razor.cs";
+
+        public const string AdminEditPageOutputFilepath_DEFAULT = "Blazor\\App\\Pages\\{NamespacePostfix}[tablename]Edit.razor";
 
         #endregion
 
@@ -177,6 +179,8 @@
         public const string OUT_AdminListPageViewModelOutputFilepath_DEFAULT = "AdminListPageViewModelOutputFilepath";
 
         public const string OUT_AdminEditViewModelOutputFilepath_DEFAULT = "AdminEditViewModelOutputFilepath";
+
+        public const string OUT_AdminEditPageOutputFilepath_DEFAULT = "AdminEditPageOutputFilepath";
 
         #endregion
 

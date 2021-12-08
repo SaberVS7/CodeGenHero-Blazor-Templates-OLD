@@ -28,10 +28,10 @@ namespace CodeGenHero.Template.Blazor5.Generators
 
             sb.AppendLine($"\tpublic partial class {className} : {repositoryInterfaceClassName}");
             sb.AppendLine("\t{");
-            sb.AppendLine($"\tprivate {dbContextName} _ctx;");
+            sb.AppendLine($"\t\tprivate {dbContextName} _ctx;");
             sb.Append(GenerateConstructor(className, dbContextName));
 
-            sb.AppendLine($"\tpublic {dbContextName} {dbContextName} {{ get {{ return _ctx; }} }}");
+            sb.AppendLine($"\t\tpublic {dbContextName} {dbContextName} {{ get {{ return _ctx; }} }}");
 
             sb.Append(GenerateGenericOperations());
 
@@ -66,7 +66,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 string methodParameterSignature = GetMethodParameterSignature(entity);
                 string methodParameterSignatureWithoutFieldTypes = GetMethodParametersWithoutTypes(entity);
 
-                sb.AppendLine($"\t#region {entityName}");
+                sb.AppendLine($"\t\t#region {entityName}");
                 sb.AppendLine(string.Empty);
 
                 sb.Append(GenerateInsertOperation(entityName));
@@ -77,7 +77,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 sb.Append(GenerateDeleteOperations(entityName, tableNamePlural, whereClause, whereClauseWithObjectInstancePrefix, methodParameterSignature));
                 sb.Append(GeneratePartialMethodSignatures(entityName, methodParameterSignature));
 
-                sb.AppendLine("\t#endregion");
+                sb.AppendLine("\t\t#endregion");
                 sb.AppendLine(string.Empty);
             }
 

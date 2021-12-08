@@ -6,21 +6,27 @@ using System.Collections.Generic;
 
 namespace CodeGenHero.Template.Blazor5.Templates
 {
-    [Template(name: "AdminListPage", version: "2021.11.12", uniqueTemplateIdGuid: "414C3369-6F09-4341-B755-A133EAB5E775",
-        description: "Generates a basic Razor page visible to Admin users that lists all of a certain metadata entity.")]
-    public class AdminListPageTemplate : BaseBlazorTemplate
+    [Template(name: "AdminEditPage", version: "2021.12.3", uniqueTemplateIdGuid: "BF6A5C3B-7D19-4F08-83E6-C341BC350F81",
+        description: "Generates a basic Razor page visible to Admin users that allows them to edit metadata entity.")]
+    public class AdminEditPageTemplate : BaseBlazorTemplate
     {
-        public AdminListPageTemplate()
+        public AdminEditPageTemplate()
         {
         }
 
         #region TemplateVariables
 
-        [TemplateVariable(defaultValue: Consts.PTG_AdminListPageViewModelClassName_DEFAULT, description: Consts.PTG_AdminListPageViewModelClassName_DESC)]
-        public string AdminListPageViewModelClassName { get; set; }
+        [TemplateVariable(defaultValue: Consts.PTG_AdminEditViewModelClassName_DEFAULT, description: Consts.PTG_AdminEditViewModelClassName_DESC)]
+        public string AdminEditViewModelClassName { get; set; }
 
-        [TemplateVariable(defaultValue: Consts.AdminListPageOutputFilepath_DEFAULT)]
-        public string AdminListPageOutputFilepath { get; set; }
+        [TemplateVariable(defaultValue: Consts.PTG_WebApiDataServiceNamespace_DEFAULT, description: Consts.PTG_WebApiDataServiceNamespace_DESC)]
+        public string WebApiDataServiceNamespace { get; set; }
+
+        [TemplateVariable(defaultValue: Consts.PTG_DtoNamespace_DEFAULT, description: Consts.PTG_DtoNamespace_DESC)]
+        public string DtoNamespace { get; set; }
+
+        [TemplateVariable(defaultValue: Consts.AdminEditPageOutputFilepath_DEFAULT, hiddenIndicator: true)]
+        public string AdminEditPageOutputFilepath { get; set; }
 
         #endregion
 
@@ -35,12 +41,12 @@ namespace CodeGenHero.Template.Blazor5.Templates
                 foreach (var entity in entities)
                 {
                     string outputFile = TemplateVariablesManager.GetOutputFile(templateIdentity: ProcessModel.TemplateIdentity,
-                        fileName: Consts.OUT_AdminListPageOutputFilepath_DEFAULT);
+                        fileName: Consts.OUT_AdminEditPageOutputFilepath_DEFAULT);
                     string filepath = TokenReplacements(outputFile, entity);
 
-                    var viewModelClassName = TokenReplacements(AdminListPageViewModelClassName, entity);
+                    var viewModelClassName = TokenReplacements(AdminEditViewModelClassName, entity);
 
-                    var generator = new AdminListPageGenerator(inflector: Inflector);
+                    var generator = new AdminEditPageGenerator(inflector: Inflector);
                     var generatedCode = generator.Generate(entity, viewModelClassName);
 
                     retVal.Files.Add(new OutputFile()

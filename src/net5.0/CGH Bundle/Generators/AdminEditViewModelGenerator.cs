@@ -8,7 +8,7 @@ using System.Text;
 
 namespace CodeGenHero.Template.Blazor5.Generators
 {
-    class AdminEditViewModelGenerator : BaseBlazorGenerator
+    public class AdminEditViewModelGenerator : BaseBlazorGenerator
     {
         public AdminEditViewModelGenerator(ICodeGenHeroInflector inflector) : base(inflector)
         {
