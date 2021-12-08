@@ -36,25 +36,6 @@ namespace CodeGenHero.Template.Blazor5.Templates
 
             try
             {
-                var usings = new List<NamespaceItem>
-                {
-                    new NamespaceItem("Microsoft.AspNetCore.Authorization"),
-                    new NamespaceItem("Microsoft.AspNetCore.Components"),
-                    new NamespaceItem("Microsoft.AspNetCore.Components.Forms"),
-                    new NamespaceItem("Microsoft.JSInterop"),
-                    new NamespaceItem($"{WebApiDataServiceNamespace}"),
-                    new NamespaceItem($"{BaseNamespace}.App.Shared"),
-                    new NamespaceItem($"{BaseNamespace}.Shared.Constants"),
-                    new NamespaceItem($"{DtoNamespace}"),
-                    new NamespaceItem("MudBlazor"),
-                    new NamespaceItem("System"),
-                    new NamespaceItem("System.Collections.Generic"),
-                    new NamespaceItem("System.IO"),
-                    new NamespaceItem("System.Net.Http"),
-                    new NamespaceItem("System.Net.Http.Headers"),
-                    new NamespaceItem("System.Threading.Tasks")
-                };
-
                 var entities = ProcessModel.MetadataSourceModel.GetEntityTypesByRegEx(RegexExclude, RegexInclude);
 
                 foreach (var entity in entities)
@@ -63,8 +44,10 @@ namespace CodeGenHero.Template.Blazor5.Templates
                         fileName: Consts.OUT_AdminEditPageOutputFilepath_DEFAULT);
                     string filepath = TokenReplacements(outputFile, entity);
 
+                    var viewModelClassName = TokenReplacements(AdminEditViewModelClassName, entity);
+
                     var generator = new AdminEditPageGenerator(inflector: Inflector);
-                    var generatedCode = generator.Generate(entity, AdminEditViewModelClassName);
+                    var generatedCode = generator.Generate(entity, viewModelClassName);
 
                     retVal.Files.Add(new OutputFile()
                     {
