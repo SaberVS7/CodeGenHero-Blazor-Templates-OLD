@@ -346,7 +346,7 @@ namespace CodeGenHero.Template.Blazor5.Generators
                 sb.AppendLine(string.Empty);
             }
 
-            sb.Append("#endregion");
+            sb.AppendLine("#endregion");
             sb.AppendLine(string.Empty);
 
             return sb.ToString();
