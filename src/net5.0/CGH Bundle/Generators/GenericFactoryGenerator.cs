@@ -52,16 +52,16 @@ namespace CodeGenHero.Template.Blazor5.Generators
         {
             IndentingStringBuilder sb = new IndentingStringBuilder(2);
 
-            sb.AppendLine("public object CreateDataShapedObject(TEntity item, List<string> lstOfFields, bool childrenRequested)");
+            sb.AppendLine("public object CreateDataShapedObject(TEntity item, List<string> lstOfFields)");
             sb.AppendLine("{");
-            sb.AppendLine("\treturn CreateDataShapedObject(Create(item), lstOfFields, childrenRequested);");
+            sb.AppendLine("\treturn CreateDataShapedObject(Create(item), lstOfFields);");
             sb.AppendLine("}");
             sb.AppendLine(string.Empty);
 
-            sb.AppendLine("public virtual object CreateDataShapedObject(object item, List<string> fieldList, bool childrenRequested)");
+            sb.AppendLine("public virtual object CreateDataShapedObject(object item, List<string> fieldList)");
             sb.AppendLine("{");
 
-            sb.AppendLine("\tif (!fieldList.Any() || childrenRequested)");
+            sb.AppendLine("\tif (!fieldList.Any())");
             sb.AppendLine("\t{");
             sb.AppendLine("\t\treturn item;");
             sb.AppendLine("\t}");

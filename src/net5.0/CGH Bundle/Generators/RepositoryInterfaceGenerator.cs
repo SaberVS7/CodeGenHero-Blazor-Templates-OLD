@@ -33,12 +33,12 @@ namespace CodeGenHero.Template.Blazor5.Generators
             foreach (var entity in entities)
             {
                 string entityName = entity.ClrType.Name;
-                string methodParameterSignature = GetSignatureWithFieldTypes(string.Empty, entity.FindPrimaryKey());
+                string methodParameterSignature = GetMethodParameterSignature(entity);
 
                 sb.AppendLine($"// {entityName}");
                 sb.AppendLine($"\t\tTask<IRepositoryActionResult<ent{namespacePostfix}.{entityName}>> Delete_{entityName}Async({methodParameterSignature});");
                 sb.AppendLine(string.Empty);
-                sb.AppendLine($"\t\tTask<ent{namespacePostfix}.{entityName}> Get_{entityName}Async({methodParameterSignature}, waEnums.RelatedEntitiesType relatedEntitiesType = waEnums.RelatedEntitiesType.None);");
+                sb.AppendLine($"\t\tTask<ent{namespacePostfix}.{entityName}> Get_{entityName}Async({methodParameterSignature}, Enums.RelatedEntitiesType relatedEntitiesType = Enums.RelatedEntitiesType.None);");
                 sb.AppendLine(string.Empty);
                 sb.AppendLine($"\t\tTask<RepositoryPageDataResponse<IList<ent{namespacePostfix}.{entityName}>>> GetPageData_{entityName}Async(RepositoryPageDataRequest request);");
                 sb.AppendLine(string.Empty);
